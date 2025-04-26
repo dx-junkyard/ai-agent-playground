@@ -37,8 +37,8 @@
 .
 ├── app/
 │   ├── main.py              # FastAPIアプリケーション
-│   ├── config.py            # 設定ファイル
 │   └── interest_response_generator.py  # AI応答生成クラス
+├── config.py            # 設定ファイル
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
@@ -66,17 +66,16 @@
 ## 環境構築
 
 ### 必要条件
-
-- Docker
-- Docker Compose
+- Docker Desktop
 - Ollama（ローカルLLM実行環境）
+※　詳細は[環境設定](https://github.com/dx-junkyard/ai-agent-playground/wiki/%E7%92%B0%E5%A2%83%E8%A8%AD%E5%AE%9A)を参照
 
 ### セットアップ
 
 1. リポジトリのクローン
 ```bash
-git clone [https://github.com/dx-junkyard/ai-agent-playground.git]
-cd [ai-agent-playground]
+git clone https://github.com/dx-junkyard/ai-agent-playground.git
+cd ai-agent-playground
 ```
 
 2. 環境変数の設定

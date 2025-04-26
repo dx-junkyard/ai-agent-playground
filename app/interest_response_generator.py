@@ -1,6 +1,6 @@
 import requests
 import logging
-from app.config import AI_MODEL, AI_URL
+from config import AI_MODEL, AI_URL
 
 # ログ設定（必要に応じてレベルを DEBUG に変更可能）
 logging.basicConfig(

@@ -1,4 +1,4 @@
-# app/config.py
+# config.py
 # ここに設定を記載します
 
 # LINEチャネルアクセストークン（LINE Developersで発行されたトークン）
