@@ -1,14 +1,7 @@
 # AI Agent 開発講座
 
-このリポジトリは、AI Agentの開発を学ぶための教材です。基礎編から応用編まで、段階的に学習できる構成になっています。
+このリポジトリは、AI Agentの開発を学ぶための教材（基礎編）です。
 
-## 目次
-
-- [基礎編](#基礎編)
-- [応用編（予定）](#応用編予定)
-- [環境構築](#環境構築)
-- [使い方](#使い方)
-- [ライセンス](#ライセンス)
 
 ## 基礎編
 
@@ -44,25 +37,6 @@
 └── requirements.txt
 ```
 
-## 応用編（予定）
-
-応用編では、以下の機能を追加予定です：
-
-1. **データベース連携**
-   - MySQLを使用した会話履歴の保存
-   - ユーザー情報の管理
-   - 会話コンテキストの保持
-
-2. **LINE Messaging API連携**
-   - Webhookの実装
-   - メッセージの送受信
-   - リッチメニューの活用
-
-3. **高度なAI機能**
-   - 会話履歴を考慮した応答生成
-   - 感情分析の統合
-   - マルチモーダル対応
-
 ## 環境構築
 
 ### 必要条件
@@ -74,7 +48,7 @@
 
 1. リポジトリのクローン
 ```bash
-git clone https://github.com/dx-junkyard/ai-agent-playground.git
+git clone -b basic-course https://github.com/dx-junkyard/ai-agent-playground.git
 cd ai-agent-playground
 ```
 
