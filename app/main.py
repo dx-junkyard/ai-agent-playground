@@ -5,6 +5,7 @@ import logging
 
 # config.pyからトークンやAPIエンドポイントをインポート
 from app.ai_response_generator import AIResponseGenerator
+from app.message_repository  import MessageRepository
 
 app = FastAPI()
 
@@ -20,11 +21,13 @@ async def post_usermessage(request: Request) -> str:
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
    
-    #repo = CuriosityLogRepository()
-    ai_response = AIResponseGenerator()
+    ai_generator = AIResponseGenerator()
     message = body.get("message", "")
-    ai_response = ai_response.create_response(message)
+    ai_response = ai_generator.create_response(message)
     logger.info(f"AI response: {ai_response}")
+    repo = MessageRepository()
+    repo.insert_message("me",message)
+    repo.insert_message("ai",ai_response)
     return ai_response
 
 if __name__ == "__main__":
