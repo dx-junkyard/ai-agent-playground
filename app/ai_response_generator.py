@@ -8,9 +8,9 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-class InterestResponseGenerator:
+class AIResponseGenerator:
     """
-    ユーザーの発言に対して、興味・関心・知識・スキルに関連した会話を盛り上げる返答を生成するクラス。
+    ユーザーの発言に対して、会話を盛り上げる返答を生成するクラス。
     """
 
     def __init__(self, model: str = AI_MODEL, base_url: str = AI_URL):
@@ -37,5 +37,5 @@ class InterestResponseGenerator:
             response.raise_for_status()
             return response.json().get("response", "").strip()
         except Exception as e:
-            logging.error(f"[✗] 要約生成失敗: {e}")
-            return "すみません、要約できませんでした。"
+            logging.error(f"[✗] 返答生成失敗: {e}")
+            return "すみません、AIが返答できませんでした。"
