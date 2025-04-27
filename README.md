@@ -37,7 +37,7 @@
 .
 ├── app/
 │   ├── main.py              # FastAPIアプリケーション
-│   └── interest_response_generator.py  # AI応答生成クラス
+│   └── ai_response_generator.py  # AI応答生成クラス
 ├── config.py            # 設定ファイル
 ├── Dockerfile
 ├── docker-compose.yml
