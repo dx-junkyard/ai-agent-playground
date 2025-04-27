@@ -39,7 +39,7 @@
 
 1. **リポジトリのクローン**
     ```bash
-    git clone https://github.com/dx-junkyard/ai-agent-playground.git
+    git clone -b mysql-integration https://github.com/dx-junkyard/ai-agent-playground.git
     cd ai-agent-playground
     ```
 
