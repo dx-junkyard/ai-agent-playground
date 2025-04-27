@@ -1,102 +1,75 @@
-# AI Agent 開発講座
+# MySQL連携編
 
-このリポジトリは、AI Agentの開発を学ぶための教材です。基礎編から応用編まで、段階的に学習できる構成になっています。
+この教材では、AI Agentの会話履歴やユーザー情報をMySQLデータベースに保存・取得する方法を学びます。
 
-## 目次
+## 学習内容
 
-- [基礎編](#基礎編)
-- [応用編（予定）](#応用編予定)
-- [環境構築](#環境構築)
-- [使い方](#使い方)
-- [ライセンス](#ライセンス)
-
-## 基礎編
-
-基礎編では、FastAPIを使用したシンプルなAI Agentの実装方法を学びます。
-
-### 学習内容
-
-1. **FastAPIの基本**
-   - エンドポイントの作成
-   - リクエスト/レスポンスの処理
-   - エラーハンドリング
-
-2. **AIモデルの統合**
-   - Ollamaを使用したローカルLLMの活用
-   - プロンプトエンジニアリングの基礎
-   - レスポンス生成の実装
-
-3. **Docker環境の構築**
-   - コンテナ化の基本
-   - マルチコンテナ環境の構築
-   - 環境変数の管理
+- MySQLデータベースのセットアップ
+- Python（FastAPI）からMySQLへの接続
+- 会話ログの保存・取得
+- ユーザーごとの履歴管理
+- Docker ComposeによるDBコンテナの統合
 
 ### プロジェクト構成
 
 ```
 .
 ├── app/
-│   ├── main.py              # FastAPIアプリケーション
+│   ├── main.py                   # FastAPIアプリケーション
+│   ├── message_repository.py     # FastAPIアプリケーション
 │   └── ai_response_generator.py  # AI応答生成クラス
-├── config.py            # 設定ファイル
+├── mysql/
+│   ├── my.cnf                    # MySQL設定ファイル
+│   └── db/user_messages.sql      # テーブル定義(DDL)
+├── config.py                     # 設定ファイル
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
 ```
 
-## 応用編（予定）
 
-応用編では、以下の機能を追加予定です：
+## MySQL連携のポイント
 
-1. **データベース連携**
-   - MySQLを使用した会話履歴の保存
-   - ユーザー情報の管理
-   - 会話コンテキストの保持
+- `CuriosityLogRepository.py`でDB接続・クエリ実行を管理
+- 会話ごとに`curiosity_log`テーブルへINSERT
+- ユーザーIDごとに履歴を取得し、AI応答生成に活用
+- DB接続情報は`app/config.py`で管理
 
-2. **LINE Messaging API連携**
-   - Webhookの実装
-   - メッセージの送受信
-   - リッチメニューの活用
+## セットアップ手順
 
-3. **高度なAI機能**
-   - 会話履歴を考慮した応答生成
-   - 感情分析の統合
-   - マルチモーダル対応
+1. **リポジトリのクローン**
+    ```bash
+    git clone https://github.com/dx-junkyard/ai-agent-playground.git
+    cd ai-agent-playground
+    ```
 
-## 環境構築
+2. **MySQLの初期化**
+    - `mysql/db/curiosity_log.sql`でテーブル作成
+    - docker compose起動時に自動で初期化されます
 
-### 必要条件
-- Docker Desktop
-- Ollama（ローカルLLM実行環境）
-※　詳細は[環境設定](https://github.com/dx-junkyard/ai-agent-playground/wiki/%E7%92%B0%E5%A2%83%E8%A8%AD%E5%AE%9A)を参照
+3. **設定ファイルの編集**
+    - `app/config.py`でDB接続情報を確認・必要に応じて修正
 
-### セットアップ
+4. **コンテナの起動**
+    ```bash
+    docker compose up -d
+    ```
 
-1. リポジトリのクローン
-```bash
-git clone https://github.com/dx-junkyard/ai-agent-playground.git
-cd ai-agent-playground
-```
+## APIの使い方
 
-2. 環境変数の設定
-```bash
-# ./app/config.pyvファイルを編集して必要な設定を行う
-```
-
-3. コンテナの起動
-```bash
-docker compose up -d
-```
-
-## 使い方
-
-### APIのテスト
+### 会話メッセージの送信・保存
 
 ```bash
 curl http://localhost:8086/api/v1/user-message \
   -X POST \
   -H "Content-Type: application/json" \
   -d '{
-    "message": "あなたのメッセージ"
+    "message": "こんにちは！"
   }'
 ```
+- 送信したメッセージはMySQLの`user_messages`テーブルに保存されます
+
+### 履歴の取得（例）
+
+- ユーザーIDごとの履歴取得や、最新メッセージの取得APIも実装例として含まれています（詳細は`message_repository.py`参照）
+
