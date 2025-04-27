@@ -1,13 +1,14 @@
 import mysql.connector
+from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
 
 class MessageRepository:
     def __init__(self):
         self.config = {
-            'host': 'db',
-            'user': 'me',
-            'password': 'me',
-            'database': 'mydb',
-            'port': 3306,
+            'host': DB_HOST,
+            'user': DB_USER,
+            'password': DB_PASSWORD,
+            'database': DB_NAME,
+            'port': DB_PORT,
             'charset': 'utf8mb4'
         }
 
@@ -34,31 +35,25 @@ class MessageRepository:
             if conn:
                 conn.close()
 
-    def get_user_messages(self, limit=10):
+    def get_user_messages(self, user_id, limit=10):
         conn = None
         cursor = None
         try:
             conn = mysql.connector.connect(**self.config)
             cursor = conn.cursor(dictionary=True)
-    
-    
-            # 結果格納用
-            user_messages = {}
-    
-            cursor.execute("""
-                SELECT message, msg_cate, msg_type
+            query = """
+                SELECT user_id, message
                 FROM user_messages
                 WHERE user_id = %s
                 ORDER BY id DESC
-                LIMIT 100
-            """, (user_id,))
-            user_messages[user_id] = cursor.fetchall()
-    
-            return user_messages
-    
+                LIMIT %s
+            """
+            cursor.execute(query, (user_id, limit))
+            messages = cursor.fetchall()
+            return messages
         except mysql.connector.Error as err:
             print(f"[✗] MySQL Error: {err}")
-            return {}
+            return []
         finally:
             if cursor: cursor.close()
             if conn: conn.close()

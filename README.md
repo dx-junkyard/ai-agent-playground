@@ -30,8 +30,8 @@
 
 ## MySQL連携のポイント
 
-- `CuriosityLogRepository.py`でDB接続・クエリ実行を管理
-- 会話ごとに`curiosity_log`テーブルへINSERT
+- `message_repository.py`でDB接続・クエリ実行を管理
+- 会話ごとに`user_messages`テーブルへINSERT
 - ユーザーIDごとに履歴を取得し、AI応答生成に活用
 - DB接続情報は`app/config.py`で管理
 
@@ -44,7 +44,7 @@
     ```
 
 2. **MySQLの初期化**
-    - `mysql/db/curiosity_log.sql`でテーブル作成
+    - `mysql/db/user_messages.sql`でテーブル作成
     - docker compose起動時に自動で初期化されます
 
 3. **設定ファイルの編集**
@@ -69,7 +69,10 @@ curl http://localhost:8086/api/v1/user-message \
 ```
 - 送信したメッセージはMySQLの`user_messages`テーブルに保存されます
 
-### 履歴の取得（例）
+### 履歴の取得
 
-- ユーザーIDごとの履歴取得や、最新メッセージの取得APIも実装例として含まれています（詳細は`message_repository.py`参照）
+```bash
+curl 'http://localhost:8086/api/v1/user-messages?user_id=me&limit=10'
+```
+- ユーザー"me"の発言履歴を最大10件取得します
 

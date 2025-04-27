@@ -1,6 +1,6 @@
 import requests
-from fastapi import FastAPI, Request, HTTPException
-from typing import Dict
+from fastapi import FastAPI, Request, HTTPException, Query
+from typing import Dict, List
 import logging
 
 # config.pyからトークンやAPIエンドポイントをインポート
@@ -29,6 +29,12 @@ async def post_usermessage(request: Request) -> str:
     repo.insert_message("me",message)
     repo.insert_message("ai",ai_response)
     return ai_response
+
+@app.get("/api/v1/user-messages")
+async def get_user_messages(user_id: str = Query(..., description="ユーザーID"), limit: int = Query(10, ge=1, le=100, description="取得件数")) -> List[Dict]:
+    repo = MessageRepository()
+    messages = repo.get_user_messages(user_id=user_id, limit=limit)
+    return messages
 
 if __name__ == "__main__":
     import uvicorn
