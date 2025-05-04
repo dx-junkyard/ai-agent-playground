@@ -30,7 +30,7 @@
 .
 ├── app/
 │   ├── main.py              # FastAPIアプリケーション
-│   └── interest_response_generator.py  # AI応答生成クラス
+│   └── ai_response_generator.py  # AI応答生成クラス
 ├── config.py            # 設定ファイル
 ├── Dockerfile
 ├── docker-compose.yml
@@ -54,12 +54,12 @@ cd ai-agent-playground
 
 2. 環境変数の設定
 ```bash
-# ./app/config.pyvファイルを編集して必要な設定を行う
+# ./app/config.pyファイルを編集して必要な設定を行う
 ```
 
 3. コンテナの起動
 ```bash
-docker compose up -d
+docker compose up
 ```
 
 ## 使い方
