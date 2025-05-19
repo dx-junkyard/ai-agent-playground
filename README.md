@@ -74,7 +74,11 @@ CREATE TABLE user_messages (
 
 4. **コンテナの起動**
     ```
+    # Windows環境
     docker compose up -d
+    
+    # Linux/Mac環境
+    docker compose up
     ```
 
 ## APIの使い方
