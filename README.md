@@ -1,53 +1,36 @@
 # AI Agent 開発講座（MySQL連携編 - Windows対応版）
 
-この教材では、AI Agentの会話履歴やユーザー情報をMySQLデータベースに保存・取得する方法を学びます。このブランチはWindows環境での実行に最適化されています。
+この教材では、AI Agentの会話履歴やユーザー情報をデータベースに保存・取得する方法を学びます。このブランチはWindows環境での実行に最適化されています。
 
 ## 学習内容
 
-- MySQLデータベースのセットアップ
-- Python（FastAPI）からMySQLへの接続
-- 会話ログの保存・取得
+- データベース連携の基本
+- FastAPIからデータベースへの接続
+- 会話履歴の保存と取得
 - ユーザーごとの履歴管理
-- Docker ComposeによるDBコンテナの統合
+- Windows環境でのコンテナ実行
 
-### プロジェクト構成
+## 主要なコンポーネント
 
-```
-.
-├── app/
-│   ├── main.py                   # FastAPIアプリケーション（エンドポイント定義）
-│   ├── message_repository.py     # メッセージ保存・取得用リポジトリクラス
-│   └── ai_response_generator.py  # AI応答生成クラス（LLMとの連携）
-├── mysql/
-│   ├── my.cnf                    # MySQL設定ファイル
-│   └── db/user_messages.sql      # テーブル定義(DDL)
-├── config.py                     # 設定ファイル（DB接続情報など）
-├── Dockerfile                    # Dockerイメージ定義
-├── docker-compose.yml            # Docker Compose設定（APIとMySQLコンテナ）
-├── api_test.sh                   # APIテスト用スクリプト
-├── db_connect.sh                 # DB接続確認用スクリプト
-└── requirements.txt              # Pythonパッケージ依存関係
-```
+- FastAPIアプリケーション: ユーザーメッセージの受信と応答の返却
+- メッセージリポジトリ: データベースとの連携処理
+- AI応答生成: LLMを使った応答の生成
 
 ## Windows環境での実装ポイント
 
-- `docker-compose.yml`からplatform指定を削除し、Windows環境でも動作するように調整
+- Windows環境でも動作するように設定を最適化
 - コマンド例はWindows環境（コマンドプロンプト/PowerShell）で実行できる形式で記載
-- `message_repository.py`でDB接続・クエリ実行を管理
-- 会話ごとに`user_messages`テーブルへINSERT
+- メッセージ保存・取得用クラスでデータベース操作を実装
+- 会話ごとにデータベースへメッセージを保存
 - ユーザーIDごとに履歴を取得し、AI応答生成に活用
-- DB接続情報は`config.py`で管理
 
 ## データベース設計
 
-```sql
-CREATE TABLE user_messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id VARCHAR(255) NOT NULL,
-    message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
+ユーザーメッセージテーブルには以下の情報が保存されます：
+- ID（自動採番）
+- ユーザーID
+- メッセージ内容
+- 作成日時
 
 ## セットアップ手順
 
@@ -57,23 +40,13 @@ CREATE TABLE user_messages (
     cd ai-agent-playground
     ```
 
-2. **MySQLの初期化**
-    - `mysql/db/user_messages.sql`でテーブル作成
-    - docker compose起動時に自動で初期化されます
+2. **環境構築**
+    - 必要な環境変数を設定
+    - 依存パッケージのインストール
 
-3. **設定ファイルの編集**
-    - `config.py`でDB接続情報を確認・必要に応じて修正
-    ```python
-    # MySQL接続情報
-    DB_HOST = "db"  # Dockerコンテナ名
-    DB_PORT = 3306
-    DB_USER = "me"
-    DB_PASSWORD = "me"
-    DB_NAME = "mydb"
+3. **アプリケーションの起動**
     ```
-
-4. **コンテナの起動**
-    ```
+    # Windowsコンソールでの起動コマンド
     docker compose up -d
     ```
 
@@ -97,9 +70,6 @@ curl http://localhost:8086/api/v1/user-message `
   -Body "{\"message\":\"こんにちは！\"}"
 ```
 
-- 送信したメッセージはMySQLの`user_messages`テーブルに保存されます
-- AIの応答も同様に保存されます
-
 ### 履歴の取得（コマンドプロンプト）
 
 ```
@@ -112,8 +82,7 @@ curl "http://localhost:8086/api/v1/user-messages?user_id=me&limit=10"
 curl "http://localhost:8086/api/v1/user-messages?user_id=me&limit=10"
 ```
 
-- ユーザー"me"の発言履歴を最大10件取得します
-- レスポンス例：
+レスポンス例：
 ```json
 [
   {
@@ -131,11 +100,10 @@ curl "http://localhost:8086/api/v1/user-messages?user_id=me&limit=10"
 ]
 ```
 
-### データベースへの直接接続（Docker経由）
+### データベースへの直接接続（Windows環境）
 
 ```
-docker exec -it my_mysql mysql --default-character-set=utf8 -u me -p mydb
-# パスワード: me
+docker exec -it mysql-container mysql --default-character-set=utf8 -u me -p mydb
 ```
 
 接続後、以下のコマンドでデータを確認できます：
