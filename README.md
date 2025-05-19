@@ -8,7 +8,7 @@
 - FastAPIからデータベースへの接続
 - 会話履歴の保存と取得
 - ユーザーごとの履歴管理
-- Windows環境でのコンテナ実行
+- Windows環境での実行
 
 ## 主要なコンポーネント
 
@@ -47,7 +47,7 @@
 3. **アプリケーションの起動**
     ```
     # Windowsコンソールでの起動コマンド
-    docker compose up -d
+    # アプリケーションを起動するコマンドを実行
     ```
 
 ## APIの使い方
@@ -103,7 +103,7 @@ curl "http://localhost:8086/api/v1/user-messages?user_id=me&limit=10"
 ### データベースへの直接接続（Windows環境）
 
 ```
-docker exec -it mysql-container mysql --default-character-set=utf8 -u me -p mydb
+# データベースに接続するコマンドを実行
 ```
 
 接続後、以下のコマンドでデータを確認できます：
