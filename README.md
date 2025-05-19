@@ -6,55 +6,34 @@
 
 - Streamlitを使用したWebフロントエンドの構築
 - FastAPIバックエンドとの連携
-- マルチコンテナ環境の構築と連携
-- ユーザーインターフェースの設計と実装
-- MySQLデータベースとの連携
+- Webインターフェースの設計と実装
+- ユーザーとAIの対話機能の実装
+- データベースとの連携
 
-## プロジェクト構成
+## 主要なコンポーネント
 
-```
-.
-├── app/
-│   ├── api/                    # FastAPIバックエンド
-│   │   ├── main.py            # メインAPIエンドポイント
-│   │   ├── ai_response_generator.py  # AI応答生成ロジック
-│   │   └── message_repository.py     # メッセージ保存ロジック
-│   └── ui/                    # Streamlitフロントエンド
-│       └── ui.py              # UIアプリケーション
-├── mysql/                     # MySQLデータベース関連
-│   └── db/user_messages.sql   # テーブル定義(DDL)
-├── config.py                  # 設定ファイル
-├── requirements.api.txt       # API依存関係
-├── requirements.ui.txt        # UI依存関係
-├── Dockerfile.api             # API用Dockerfile
-├── Dockerfile.ui              # UI用Dockerfile
-├── docker-compose.yaml        # Docker Compose設定
-├── api_test.sh                # APIテスト用スクリプト
-└── db_connect.sh              # DB接続確認用スクリプト
-```
+- FastAPIバックエンド: ユーザーメッセージの処理とAI応答の生成
+- Streamlitフロントエンド: ユーザーインターフェースの提供
+- データベース連携: 会話履歴の保存と取得
 
 ## 実装のポイント
 
 ### バックエンド（FastAPI）
-- `app/api/main.py`でAPIエンドポイントを定義
-- `app/api/message_repository.py`でデータベース操作を実装
-- `app/api/ai_response_generator.py`でAI応答生成ロジックを実装
+- APIエンドポイントの定義
+- データベース操作の実装
+- AI応答生成ロジックの実装
 
 ### フロントエンド（Streamlit）
-- `app/ui/ui.py`でユーザーインターフェースを実装
-- APIとの通信は`requests`ライブラリを使用
-- セッション状態を使用して会話履歴を管理
-
-### データベース（MySQL）
-- ユーザーメッセージとAI応答を保存
-- 会話履歴の取得と表示
+- ユーザーインターフェースの実装
+- APIとの通信処理
+- セッション状態を使用した会話履歴の管理
 
 ## セットアップ
 
 ### 前提条件
 
-- Docker
-- Docker Compose
+- Python 3.9以上
+- 必要なパッケージ（requirements.txtに記載）
 
 ### セットアップ手順
 
@@ -64,13 +43,13 @@
     cd ai-agent-playground
     ```
 
-2. **設定ファイルの編集**
-    - `config.py`でDB接続情報やAIモデル設定を確認・必要に応じて修正
+2. **環境構築**
+    - 必要な環境変数を設定
+    - 依存パッケージのインストール
 
-3. **Dockerコンテナのビルドと起動**
+3. **アプリケーションの起動**
     ```bash
-    docker compose build
-    docker compose up -d
+    # バックエンドとフロントエンドを起動するコマンドを実行
     ```
 
 4. **アプリケーションにアクセス**
@@ -121,18 +100,6 @@ curl 'http://localhost:8086/api/v1/user-messages?user_id=me&limit=10'
 - ユーザーメッセージの入力
 - AI応答の表示
 - メッセージ履歴の表示
-
-## 環境変数
-
-必要な環境変数：
-
-- `AI_MODEL`: 使用するAIモデル名
-- `AI_URL`: AIモデルのAPIエンドポイント
-- `DB_HOST`: データベースホスト
-- `DB_PORT`: データベースポート
-- `DB_USER`: データベースユーザー
-- `DB_PASSWORD`: データベースパスワード
-- `DB_NAME`: データベース名
 
 ## 拡張アイデア
 
