@@ -10,6 +10,29 @@
 - ユーザーとAIの対話機能の実装
 - データベースとの連携
 
+## プロジェクト構成
+
+```
+.
+├── app/
+│   ├── api/                    # FastAPIバックエンド
+│   │   ├── main.py            # メインAPIエンドポイント
+│   │   ├── ai_response_generator.py  # AI応答生成ロジック
+│   │   └── message_repository.py     # メッセージ保存ロジック
+│   └── ui/                    # Streamlitフロントエンド
+│       └── ui.py              # UIアプリケーション
+├── mysql/                     # MySQLデータベース関連
+│   └── db/user_messages.sql   # テーブル定義(DDL)
+├── config.py                  # 設定ファイル
+├── requirements.api.txt       # API依存関係
+├── requirements.ui.txt        # UI依存関係
+├── Dockerfile.api             # API用Dockerfile
+├── Dockerfile.ui              # UI用Dockerfile
+├── docker-compose.yaml        # Docker Compose設定
+├── api_test.sh                # APIテスト用スクリプト
+└── db_connect.sh              # DB接続確認用スクリプト
+```
+
 ## 主要なコンポーネント
 
 - FastAPIバックエンド: ユーザーメッセージの処理とAI応答の生成
