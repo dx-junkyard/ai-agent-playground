@@ -10,6 +10,25 @@
 - ユーザーごとの履歴管理
 - 複数コンテナ環境の構築
 
+## プロジェクト構成
+
+```
+.
+├── app/
+│   ├── main.py                   # FastAPIアプリケーション（エンドポイント定義）
+│   ├── message_repository.py     # メッセージ保存・取得用リポジトリクラス
+│   └── ai_response_generator.py  # AI応答生成クラス（LLMとの連携）
+├── mysql/
+│   ├── my.cnf                    # MySQL設定ファイル
+│   └── db/user_messages.sql      # テーブル定義(DDL)
+├── config.py                     # 設定ファイル（DB接続情報など）
+├── Dockerfile                    # Dockerイメージ定義
+├── docker-compose.yml            # Docker Compose設定（APIとMySQLコンテナ）
+├── api_test.sh                   # APIテスト用スクリプト
+├── db_connect.sh                 # DB接続確認用スクリプト
+└── requirements.txt              # Pythonパッケージ依存関係
+```
+
 ## 主要なコンポーネント
 
 - FastAPIアプリケーション: ユーザーメッセージの処理とAI応答の生成
