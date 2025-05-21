@@ -4,7 +4,7 @@ from typing import Dict
 import logging
 
 # config.pyからトークンやAPIエンドポイントをインポート
-from app.ai_response_generator import AIResponseGenerator
+from app.ai import AIResponseGenerator
 
 app = FastAPI()
 

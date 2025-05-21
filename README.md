@@ -29,7 +29,7 @@
 .
 ├── app/
 │   ├── main.py              # FastAPIアプリケーション（エンドポイント定義）
-│   └── ai_response_generator.py  # AI応答生成クラス（LLMとの連携）
+│   └── ai.py  # AI応答生成クラス（LLMとの連携）
 ├── config.py            # 設定ファイル（AI_MODEL, AI_URLなどの設定）
 ├── Dockerfile           # Dockerイメージ定義
 ├── docker-compose.yml   # Docker Compose設定
@@ -40,7 +40,7 @@
 ## 実装のポイント
 
 - `app/main.py`でFastAPIのエンドポイントを定義し、ユーザーからのメッセージを受け取る
-- `app/ai_response_generator.py`でOllamaのAPIを呼び出し、AIの応答を生成
+- `app/ai.py`でOllamaのAPIを呼び出し、AIの応答を生成
 - `config.py`でAIモデルやAPIエンドポイントなどの設定を管理
 
 ## 環境構築
