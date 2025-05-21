@@ -4,8 +4,8 @@ from typing import Dict, List
 import logging
 
 # config.pyからトークンやAPIエンドポイントをインポート
-from app.ai_response_generator import AIResponseGenerator
-from app.message_repository  import MessageRepository
+from app.ai import AIResponseGenerator
+from app.db import MessageRepository
 
 app = FastAPI()
 
