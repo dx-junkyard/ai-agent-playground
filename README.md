@@ -16,8 +16,8 @@
 .
 ├── app/
 │   ├── main.py                   # FastAPIアプリケーション（エンドポイント定義）
-│   ├── message_repository.py     # メッセージ保存・取得用リポジトリクラス
-│   └── ai_response_generator.py  # AI応答生成クラス（LLMとの連携）
+│   ├── db.py                    # メッセージ保存・取得用リポジトリクラス
+│   └── ai.py                    # AI応答生成クラス（LLMとの連携）
 ├── mysql/
 │   ├── my.cnf                    # MySQL設定ファイル
 │   └── db/user_messages.sql      # テーブル定義(DDL)
