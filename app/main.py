@@ -4,7 +4,7 @@ from typing import Dict
 import logging
 
 # config.pyからトークンやAPIエンドポイントをインポート
-from app.ai import AIResponseGenerator
+from app.ai import AIClient
 
 app = FastAPI()
 
@@ -21,9 +21,9 @@ async def post_usermessage(request: Request) -> str:
         raise HTTPException(status_code=400, detail="Invalid JSON")
    
     #repo = CuriosityLogRepository()
-    ai_response = AIResponseGenerator()
+    ai_client = AIClient()
     message = body.get("message", "")
-    ai_response = ai_response.create_response(message)
+    ai_response = ai_client.create_response(message)
     logger.info(f"AI response: {ai_response}")
     return ai_response
 
