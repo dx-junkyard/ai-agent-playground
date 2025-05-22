@@ -1,7 +1,7 @@
 import mysql.connector
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
 
-class MessageRepository:
+class DBClient:
     def __init__(self):
         self.config = {
             'host': DB_HOST,

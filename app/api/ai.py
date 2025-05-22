@@ -8,7 +8,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-class AIResponseGenerator:
+class AIClient:
     """
     ユーザーの発言に対して、会話を盛り上げる返答を生成するクラス。
     """
@@ -16,7 +16,7 @@ class AIResponseGenerator:
     def __init__(self, model: str = AI_MODEL, base_url: str = AI_URL):
         self.model = model
         self.api_url = f"{base_url}/api/generate"
-        logging.info(f"InterestResponseGenerator initialized with model: {model} and endpoint: {self.api_url}")
+        logging.info(f"AIClient initialized with model: {model} and endpoint: {self.api_url}")
 
     def create_response(self, user_message: str) -> str:
         """

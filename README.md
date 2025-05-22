@@ -17,8 +17,8 @@
 ├── app/
 │   ├── api/                    # FastAPIバックエンド
 │   │   ├── main.py            # メインAPIエンドポイント
-│   │   ├── ai_response_generator.py  # AI応答生成ロジック
-│   │   └── message_repository.py     # メッセージ保存ロジック
+│   │   ├── ai.py              # AI応答生成ロジック
+│   │   └── db.py              # メッセージ保存ロジック
 │   └── ui/                    # Streamlitフロントエンド
 │       └── ui.py              # UIアプリケーション
 ├── mysql/                     # MySQLデータベース関連
