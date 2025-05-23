@@ -1,5 +1,6 @@
 # jhjcpishva/learn-devin
 
+This is a learning repository for working with audio files using Python.
 
 ## What to achieve?
 
