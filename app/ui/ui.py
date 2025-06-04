@@ -60,7 +60,30 @@ class ChatUI:
             elif not text:
                 st.session_state.voice_processed = False
 
-        st.text_input("メッセージを入力してください:", key="input")
+        st.markdown(
+            """
+            <style>
+            #chat-area {height: calc(100vh - 160px); overflow-y: auto; padding-bottom: 70px;}
+            #input-area {position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px 5px; z-index: 1000;}
+            @keyframes voice-blink {0%, 100% {background-color: #fdd;} 50% {background-color: #fee;}}
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown('<div id="chat-area">', unsafe_allow_html=True)
+        for chat in st.session_state.history:
+            st.markdown(f"**あなた:** {chat['user']}")
+            st.markdown(f"**AI:** {chat['ai']}")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        st.markdown('<div id="input-area">', unsafe_allow_html=True)
+        st.text_input(
+            "メッセージを入力してください:",
+            key="input",
+            label_visibility="collapsed",
+            placeholder="メッセージを入力してください",
+        )
         col_send, col_voice = st.columns([1, 1])
         with col_send:
             st.button("送信", key="send_button", on_click=self.submit)
@@ -72,15 +95,10 @@ class ChatUI:
                 st.session_state.voice_processed = False
                 # immediately rerun so transcription can happen
                 self._rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown(
             """
-            <style>
-            @keyframes voice-blink {
-                0%, 100% {background-color: #fdd;}
-                50% {background-color: #fee;}
-            }
-            </style>
             <script>
             const sendBtn = window.parent.document.querySelector('button[id="send_button"]');
             const observer = new MutationObserver(() => {
@@ -97,10 +115,6 @@ class ChatUI:
             """,
             unsafe_allow_html=True,
         )
-
-        for chat in st.session_state.history:
-            st.markdown(f"**あなた:** {chat['user']}")
-            st.markdown(f"**AI:** {chat['ai']}")
 
 
 def main():
