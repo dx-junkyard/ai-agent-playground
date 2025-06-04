@@ -16,14 +16,14 @@ VOSK_MODEL_PATH = os.getenv("VOSK_MODEL_PATH", "model")
 MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-small-ja-0.22.zip"
 
 
-class Voice:
+class VoiceInput:
     """Handle voice recording and speech recognition."""
 
     @staticmethod
     @st.cache_resource(show_spinner=False)
     def load_vosk_model() -> Model:
         """Load Vosk model once and reuse it across reruns."""
-        if not Voice.ensure_vosk_model():
+        if not VoiceInput.ensure_vosk_model():
             raise RuntimeError("Failed to prepare Vosk model")
         return Model(VOSK_MODEL_PATH)
 
@@ -86,7 +86,7 @@ class Voice:
         """Transcribe a recorded AudioSegment using Vosk."""
         if len(audio) == 0:
             return ""
-        if not Voice.ensure_vosk_model():
+        if not VoiceInput.ensure_vosk_model():
             return ""
 
         audio = (
@@ -95,7 +95,7 @@ class Voice:
             .set_sample_width(2)
         )
         with st.spinner("音声認識中..."):
-            model = Voice.load_vosk_model()
+            model = VoiceInput.load_vosk_model()
             recognizer = KaldiRecognizer(model, 16000)
             recognizer.AcceptWaveform(audio.raw_data)
             result = json.loads(recognizer.FinalResult())
