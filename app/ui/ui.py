@@ -64,7 +64,7 @@ class ChatUI:
             """
             <style>
             #chat-area {
-                height: calc(100vh - 140px);
+                max-height: calc(100vh - 140px);
                 overflow-y: auto;
                 padding-bottom: 120px;
             }
@@ -91,31 +91,33 @@ class ChatUI:
             unsafe_allow_html=True,
         )
 
-        st.markdown('<div id="chat-area">', unsafe_allow_html=True)
-        for chat in st.session_state.history:
-            st.markdown(f"**あなた:** {chat['user']}")
-            st.markdown(f"**AI:** {chat['ai']}")
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container():
+            st.markdown('<div id="chat-area">', unsafe_allow_html=True)
+            for chat in st.session_state.history:
+                st.markdown(f"**あなた:** {chat['user']}")
+                st.markdown(f"**AI:** {chat['ai']}")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown('<div id="input-area">', unsafe_allow_html=True)
-        st.text_input(
-            "メッセージを入力してください:",
-            key="input",
-            label_visibility="collapsed",
-            placeholder="メッセージを入力してください",
-        )
-        col_send, col_voice = st.columns([1, 1])
-        with col_send:
-            st.button("送信", key="send_button", on_click=self.submit)
-        with col_voice:
-            audio = self.voice.record_audio()
-            if len(audio) > 0:
-                st.session_state.last_audio = audio
-                # allow the new audio to be processed on the next run
-                st.session_state.voice_processed = False
-                # immediately rerun so transcription can happen
-                self._rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
+        with st.container() as input_container:
+            input_container.markdown('<div id="input-area">', unsafe_allow_html=True)
+            st.text_input(
+                "メッセージを入力してください:",
+                key="input",
+                label_visibility="collapsed",
+                placeholder="メッセージを入力してください",
+            )
+            col_send, col_voice = st.columns([1, 1])
+            with col_send:
+                st.button("送信", key="send_button", on_click=self.submit)
+            with col_voice:
+                audio = self.voice.record_audio()
+                if len(audio) > 0:
+                    st.session_state.last_audio = audio
+                    # allow the new audio to be processed on the next run
+                    st.session_state.voice_processed = False
+                    # immediately rerun so transcription can happen
+                    self._rerun()
+            input_container.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown(
             """
