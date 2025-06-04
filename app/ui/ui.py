@@ -2,7 +2,7 @@ import logging
 import requests
 import streamlit as st
 
-from voice import Voice
+from voice_input import VoiceInput
 from audio_output import AudioOutput
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ class ChatUI:
     """Main chat UI handling text and voice input."""
 
     def __init__(self):
-        self.voice = Voice()
+        self.voice = VoiceInput()
         self.audio_output = AudioOutput()
 
     @staticmethod
