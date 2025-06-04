@@ -1,11 +1,11 @@
 import os
-import queue
 import json
 import shutil
 import zipfile
 import streamlit as st
 import requests
-import sounddevice as sd
+from audiorecorder import audiorecorder
+from pydub import AudioSegment
 from vosk import Model, KaldiRecognizer
 
 API_URL = "http://api:8000/api/v1/user-message"
@@ -44,36 +44,24 @@ def ensure_vosk_model() -> bool:
         return False
 
 
-def recognize_voice(duration: int = 5) -> str:
-    """Record audio from microphone and transcribe it using Vosk."""
+def recognize_voice() -> str:
+    """Record audio in the browser and transcribe it using Vosk."""
+    audio = audiorecorder("録音開始", "録音終了")
+    if len(audio) == 0:
+        return ""
     if not ensure_vosk_model():
         return ""
 
-    model = Model(VOSK_MODEL_PATH)
-    recognizer = KaldiRecognizer(model, 16000)
-    q = queue.Queue()
-
-    try:
-        sd.query_devices(None, "input")
-    except sd.PortAudioError as e:
-        st.error(f"音声入力デバイスを取得できません: {e}")
-        return ""
-
-    def callback(indata, frames, time, status):
-        if status:
-            st.warning(str(status))
-        q.put(bytes(indata))
-
-    try:
-        with sd.RawInputStream(samplerate=16000, blocksize=8000, dtype="int16",
-                               channels=1, callback=callback):
-            for _ in range(int(duration * 16000 / 8000)):
-                data = q.get()
-                recognizer.AcceptWaveform(data)
-    except sd.PortAudioError as e:
-        st.error(f"録音に失敗しました: {e}")
-        return ""
-    result = json.loads(recognizer.FinalResult())
+    audio = (
+        audio.set_channels(1)
+        .set_frame_rate(16000)
+        .set_sample_width(2)
+    )
+    with st.spinner("音声認識中..."):
+        model = Model(VOSK_MODEL_PATH)
+        recognizer = KaldiRecognizer(model, 16000)
+        recognizer.AcceptWaveform(audio.raw_data)
+        result = json.loads(recognizer.FinalResult())
     return result.get("text", "")
 
 def send_message(msg: str) -> str:
@@ -103,16 +91,11 @@ def main():
     # テキスト入力ウィジェット：ここでは state["input"] が自動的に使われる
     st.text_input("メッセージを入力してください:", key="input")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        st.button("送信", on_click=submit)
-    with col2:
-        if st.button("音声入力"):
-            with st.spinner("録音中..."):
-                text = recognize_voice()
-            if text:
-                st.session_state["input"] = text
-                submit()
+    st.button("送信", on_click=submit)
+    text = recognize_voice()
+    if text:
+        st.session_state["input"] = text
+        submit()
 
     # 履歴表示
     for chat in st.session_state.history:
