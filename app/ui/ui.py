@@ -48,23 +48,26 @@ class ChatUI:
         if "voice_processed" not in st.session_state:
             st.session_state.voice_processed = False
 
-        audio = self.voice.record_audio()
+        # If we have audio from the previous run, transcribe it before any
+        # widgets are created so we can safely set session state.
+        if "last_audio" in st.session_state:
+            text = self.voice.transcribe(st.session_state.pop("last_audio"))
+            if text and not st.session_state.voice_processed:
+                st.session_state.voice_processed = True
+                st.session_state["input"] = text
+                self.submit()
+                self._rerun()
+            elif not text:
+                st.session_state.voice_processed = False
 
         st.text_input("メッセージを入力してください:", key="input")
         col_send, col_voice = st.columns([1, 1])
         with col_send:
             st.button("送信", key="send_button", on_click=self.submit)
         with col_voice:
-            pass  # voice button already rendered by record_audio
-
-        text = self.voice.transcribe(audio)
-        if text and not st.session_state.voice_processed:
-            st.session_state.voice_processed = True
-            st.session_state["input"] = text
-            self.submit()
-            self._rerun()
-        elif not text:
-            st.session_state.voice_processed = False
+            audio = self.voice.record_audio()
+            if len(audio) > 0:
+                st.session_state.last_audio = audio
 
         st.markdown(
             """
