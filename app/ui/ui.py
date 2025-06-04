@@ -63,9 +63,26 @@ class ChatUI:
         st.markdown(
             """
             <style>
-            #chat-area {height: calc(100vh - 160px); overflow-y: auto; padding-bottom: 70px;}
-            #input-area {position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px 5px; z-index: 1000;}
-            @keyframes voice-blink {0%, 100% {background-color: #fdd;} 50% {background-color: #fee;}}
+            #chat-area {
+                height: calc(100vh - 180px);
+                overflow-y: auto;
+                padding-bottom: 90px;
+            }
+            #input-area {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                width: 100%;
+                background: white;
+                padding: 10px 5px;
+                box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+                z-index: 1000;
+            }
+            @keyframes voice-blink {
+                0%, 100% {background-color: #fdd;}
+                50% {background-color: #fee;}
+            }
             </style>
             """,
             unsafe_allow_html=True,
