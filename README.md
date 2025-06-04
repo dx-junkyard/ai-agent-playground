@@ -64,7 +64,7 @@
 
 1. **リポジトリのクローン**
     ```bash
-    git clone -b ui-integration https://github.com/dx-junkyard/ai-agent-playground.git
+    git clone -b voice https://github.com/dx-junkyard/ai-agent-playground.git
     cd ai-agent-playground
     ```
 
