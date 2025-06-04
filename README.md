@@ -121,6 +121,52 @@ UI連携編では、StreamlitによるWebフロントエンドの実装と、Fas
 └── requirements.txt
 ```
 
+### [音声入出力編（voice）](https://github.com/dx-junkyard/ai-agent-playground/tree/voice)
+
+音声入出力編では、Webブラウザでの音声入力と音声出力機能を持つAI Agentの実装方法を学びます。
+
+#### 学習内容
+
+1. **音声入力機能の実装**
+   - Vosk音声認識モデルの統合
+   - ブラウザでのマイク録音機能
+   - 音声データの処理とテキスト変換
+
+2. **音声出力機能の実装**
+   - ブラウザのSpeechSynthesis APIの活用
+   - AI応答の自動音声読み上げ
+   - 音声出力の制御
+
+3. **Webインターフェースの拡張**
+   - Streamlitでの音声UI実装
+   - リアルタイム音声処理
+   - ユーザビリティの向上
+
+#### プロジェクト構成
+
+```
+.
+├── app/
+│   ├── api/                    # FastAPIバックエンド
+│   │   ├── main.py            # メインAPIエンドポイント
+│   │   ├── ai.py              # AI応答生成ロジック
+│   │   └── db.py              # メッセージ保存ロジック
+│   └── ui/                    # Streamlitフロントエンド
+│       ├── ui.py              # UIアプリケーション
+│       ├── voice_input.py     # 音声入力機能
+│       └── audio_output.py    # 音声出力機能
+├── mysql/                     # MySQLデータベース関連
+│   └── db/user_messages.sql   # テーブル定義(DDL)
+├── config.py                  # 設定ファイル
+├── requirements.api.txt       # API依存関係
+├── requirements.ui.txt        # UI依存関係
+├── Dockerfile.api             # API用Dockerfile
+├── Dockerfile.ui              # UI用Dockerfile
+├── docker-compose.yaml        # Docker Compose設定
+├── api_test.sh                # APIテスト用スクリプト
+└── db_connect.sh              # DB接続確認用スクリプト
+```
+
 ## 環境構築
 
 ### 必要条件
@@ -146,6 +192,9 @@ git checkout mysql-integration
 
 # UI連携編
 git checkout ui-integration
+
+# 音声入出力編
+git checkout voice
 ```
 
 3. 環境変数の設定
