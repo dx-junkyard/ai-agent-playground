@@ -70,6 +70,8 @@ class ChatUI:
                 st.session_state.last_audio = audio
                 # allow the new audio to be processed on the next run
                 st.session_state.voice_processed = False
+                # immediately rerun so transcription can happen
+                self._rerun()
 
         st.markdown(
             """

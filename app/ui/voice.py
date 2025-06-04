@@ -6,7 +6,6 @@ import logging
 
 import streamlit as st
 import requests
-from typing import Optional
 
 from vosk import Model, KaldiRecognizer
 from audiorecorder import audiorecorder
