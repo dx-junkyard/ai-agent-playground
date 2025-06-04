@@ -102,6 +102,13 @@ def submit():
     # ← ここでのみ input をクリア
     st.session_state["input"] = ""
 
+def _rerun():
+    """Rerun Streamlit script with backward compatibility."""
+    if hasattr(st, "experimental_rerun"):
+        st.experimental_rerun()
+    else:
+        st.rerun()
+
 def main():
     st.set_page_config(page_title="AI チャットアプリ", page_icon="🤖")
     if "history" not in st.session_state:
@@ -115,6 +122,7 @@ def main():
         st.session_state.voice_processed = True
         st.session_state["input"] = text
         submit()
+        _rerun()
     elif not text:
         st.session_state.voice_processed = False
 
