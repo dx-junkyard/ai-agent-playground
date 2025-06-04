@@ -139,3 +139,7 @@ curl 'http://localhost:8086/api/v1/user-messages?user_id=me&limit=10'
 - 複数のAIモデル切り替え機能
 - メッセージの検索機能
 - 会話履歴のエクスポート機能
+
+## ライセンス
+
+このプロジェクトは[MITライセンス](LICENSE)の下で公開されています。
