@@ -5,7 +5,6 @@ import zipfile
 import streamlit as st
 import requests
 from audiorecorder import audiorecorder
-from pydub import AudioSegment
 from vosk import Model, KaldiRecognizer
 
 API_URL = "http://api:8000/api/v1/user-message"
@@ -46,7 +45,14 @@ def ensure_vosk_model() -> bool:
 
 def recognize_voice() -> str:
     """Record audio in the browser and transcribe it using Vosk."""
-    audio = audiorecorder("録音開始", "録音終了")
+    try:
+        audio = audiorecorder("録音開始", "録音終了")
+    except FileNotFoundError as e:
+        st.error("ffmpeg が見つかりません。Docker イメージを再ビルドしてください")
+        return ""
+    except Exception as e:
+        st.error(f"録音エラー: {e}")
+        return ""
     if len(audio) == 0:
         return ""
     if not ensure_vosk_model():
