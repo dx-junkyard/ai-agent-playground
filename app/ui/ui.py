@@ -3,6 +3,7 @@ import requests
 import streamlit as st
 
 from voice import Voice
+from audio_output import AudioOutput
 
 logger = logging.getLogger(__name__)
 
@@ -14,6 +15,7 @@ class ChatUI:
 
     def __init__(self):
         self.voice = Voice()
+        self.audio_output = AudioOutput()
 
     @staticmethod
     def send_message(msg: str) -> str:
@@ -30,6 +32,7 @@ class ChatUI:
         if msg:
             ai = self.send_message(msg)
             st.session_state.history.append({"user": msg, "ai": ai})
+            self.audio_output.speak(ai)
         else:
             st.warning("メッセージを入力してください。")
         st.session_state["input"] = ""
