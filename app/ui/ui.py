@@ -32,7 +32,7 @@ class ChatUI:
         if msg:
             ai = self.send_message(msg)
             st.session_state.history.append({"user": msg, "ai": ai})
-            self.audio_output.speak(ai)
+            st.session_state.speak_text = ai
         else:
             st.warning("メッセージを入力してください。")
         st.session_state["input"] = ""
@@ -100,6 +100,8 @@ class ChatUI:
                 st.markdown(f"**あなた:** {chat['user']}")
                 st.markdown(f"**AI:** {chat['ai']}")
             st.markdown('</div>', unsafe_allow_html=True)
+            if 'speak_text' in st.session_state:
+                self.audio_output.speak(st.session_state.pop('speak_text'))
 
         input_container = st.container()
         with input_container:
