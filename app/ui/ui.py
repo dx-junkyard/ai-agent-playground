@@ -93,18 +93,17 @@ def main():
     st.set_page_config(page_title="AI チャットアプリ", page_icon="🤖")
     if "history" not in st.session_state:
         st.session_state.history = []
+    if "voice_processed" not in st.session_state:
+        st.session_state.voice_processed = False
 
     # 音声入力があればテキストとしてセットして送信
     text = recognize_voice()
-    if text:
+    if text and not st.session_state.voice_processed:
+        st.session_state.voice_processed = True
         st.session_state["input"] = text
         submit()
-        # 送信後はテキストボックスをクリアした状態で表示させるために再実行
-        rerun = getattr(st, "experimental_rerun", None)
-        if rerun is None:
-            rerun = getattr(st, "rerun", None)
-        if callable(rerun):
-            rerun()
+    elif not text:
+        st.session_state.voice_processed = False
 
     # テキスト入力ウィジェット：ここでは state["input"] が自動的に使われる
     st.text_input("メッセージを入力してください:", key="input")
