@@ -48,7 +48,16 @@ class ChatUI:
         if "voice_processed" not in st.session_state:
             st.session_state.voice_processed = False
 
-        text = self.voice.recognize_voice()
+        audio = self.voice.record_audio()
+
+        st.text_input("メッセージを入力してください:", key="input")
+        col_send, col_voice = st.columns([1, 1])
+        with col_send:
+            st.button("送信", key="send_button", on_click=self.submit)
+        with col_voice:
+            pass  # voice button already rendered by record_audio
+
+        text = self.voice.transcribe(audio)
         if text and not st.session_state.voice_processed:
             st.session_state.voice_processed = True
             st.session_state["input"] = text
@@ -57,8 +66,30 @@ class ChatUI:
         elif not text:
             st.session_state.voice_processed = False
 
-        st.text_input("メッセージを入力してください:", key="input")
-        st.button("送信", on_click=self.submit)
+        st.markdown(
+            """
+            <style>
+            @keyframes voice-blink {
+                0%, 100% {background-color: #fdd;}
+                50% {background-color: #fee;}
+            }
+            </style>
+            <script>
+            const sendBtn = window.parent.document.querySelector('button[id="send_button"]');
+            const observer = new MutationObserver(() => {
+                const stopBtn = Array.from(window.parent.document.querySelectorAll('button')).find(b => b.innerText.includes('録音終了'));
+                if (stopBtn) {
+                    if (sendBtn) sendBtn.disabled = true;
+                    stopBtn.style.animation = 'voice-blink 1.5s ease-in-out infinite';
+                } else {
+                    if (sendBtn) sendBtn.disabled = false;
+                }
+            });
+            observer.observe(window.parent.document.body, {subtree: true, childList: true});
+            </script>
+            """,
+            unsafe_allow_html=True,
+        )
 
         for chat in st.session_state.history:
             st.markdown(f"**あなた:** {chat['user']}")

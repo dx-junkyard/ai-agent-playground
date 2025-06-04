@@ -6,6 +6,8 @@ import logging
 
 import streamlit as st
 import requests
+from typing import Optional
+
 from vosk import Model, KaldiRecognizer
 from audiorecorder import audiorecorder
 
@@ -58,16 +60,31 @@ class Voice:
             return False
 
     @staticmethod
-    def recognize_voice() -> str:
-        """Record audio in the browser and transcribe it using Vosk."""
+    def record_audio() -> "AudioSegment":
+        """Render the audio recorder widget and return the recorded segment."""
         try:
-            audio = audiorecorder("録音開始", "録音終了")
+            audio = audiorecorder(
+                "音声入力",
+                "録音終了",
+                start_style={},
+                stop_style={"background-color": "#fdd"},
+                key="voice_recorder",
+            )
         except FileNotFoundError:
             st.error("ffmpeg が見つかりません。Docker イメージを再ビルドしてください")
-            return ""
+            from pydub import AudioSegment
+
+            return AudioSegment.empty()
         except Exception as e:
             st.error(f"録音エラー: {e}")
-            return ""
+            from pydub import AudioSegment
+
+            return AudioSegment.empty()
+        return audio
+
+    @staticmethod
+    def transcribe(audio) -> str:
+        """Transcribe a recorded AudioSegment using Vosk."""
         if len(audio) == 0:
             return ""
         if not Voice.ensure_vosk_model():
@@ -86,3 +103,8 @@ class Voice:
         text = result.get("text", "")
         logger.info(f"Recognized voice text: {text}")
         return text
+
+    def recognize_voice(self) -> str:
+        """Record audio via widget then transcribe it."""
+        audio = self.record_audio()
+        return self.transcribe(audio)
