@@ -68,6 +68,8 @@ class ChatUI:
             audio = self.voice.record_audio()
             if len(audio) > 0:
                 st.session_state.last_audio = audio
+                # allow the new audio to be processed on the next run
+                st.session_state.voice_processed = False
 
         st.markdown(
             """
