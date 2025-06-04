@@ -2,14 +2,25 @@ import os
 import json
 import shutil
 import zipfile
+import logging
 import streamlit as st
 import requests
+
+logger = logging.getLogger(__name__)
 from audiorecorder import audiorecorder
 from vosk import Model, KaldiRecognizer
 
 API_URL = "http://api:8000/api/v1/user-message"
 VOSK_MODEL_PATH = os.getenv("VOSK_MODEL_PATH", "model")
 MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-small-ja-0.22.zip"
+
+
+@st.cache_resource(show_spinner=False)
+def load_vosk_model() -> Model:
+    """Load Vosk model once and reuse it across reruns."""
+    if not ensure_vosk_model():
+        raise RuntimeError("Failed to prepare Vosk model")
+    return Model(VOSK_MODEL_PATH)
 
 
 def ensure_vosk_model() -> bool:
@@ -64,11 +75,13 @@ def recognize_voice() -> str:
         .set_sample_width(2)
     )
     with st.spinner("音声認識中..."):
-        model = Model(VOSK_MODEL_PATH)
+        model = load_vosk_model()
         recognizer = KaldiRecognizer(model, 16000)
         recognizer.AcceptWaveform(audio.raw_data)
         result = json.loads(recognizer.FinalResult())
-    return result.get("text", "")
+    text = result.get("text", "")
+    logger.info(f"Recognized voice text: {text}")
+    return text
 
 def send_message(msg: str) -> str:
     try:
@@ -93,15 +106,22 @@ def main():
     st.set_page_config(page_title="AI チャットアプリ", page_icon="🤖")
     if "history" not in st.session_state:
         st.session_state.history = []
+    if "voice_processed" not in st.session_state:
+        st.session_state.voice_processed = False
+
+    # 音声入力があればテキストとしてセットして送信
+    text = recognize_voice()
+    if text and not st.session_state.voice_processed:
+        st.session_state.voice_processed = True
+        st.session_state["input"] = text
+        submit()
+    elif not text:
+        st.session_state.voice_processed = False
 
     # テキスト入力ウィジェット：ここでは state["input"] が自動的に使われる
     st.text_input("メッセージを入力してください:", key="input")
 
     st.button("送信", on_click=submit)
-    text = recognize_voice()
-    if text:
-        st.session_state["input"] = text
-        submit()
 
     # 履歴表示
     for chat in st.session_state.history:

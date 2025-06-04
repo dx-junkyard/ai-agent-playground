@@ -8,6 +8,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
+logger = logging.getLogger(__name__)
 class AIClient:
     """
     ユーザーの発言に対して、会話を盛り上げる返答を生成するクラス。
@@ -27,6 +28,7 @@ class AIClient:
     【ユーザー発言】:
     {user_message}
     """
+        logger.info(f"Prompt sent to LLM: {prompt}")
 
         try:
             response = requests.post(self.api_url, json={
