@@ -92,10 +92,12 @@
 
 #### 音声入力を利用するには
 
-1. [Vosk](https://alphacephei.com/vosk/models) から日本語モデルをダウンロードします
-2. 展開したフォルダーのパスを `VOSK_MODEL_PATH` 環境変数に設定します
-3. UIを起動すると音声認識が利用できます
-4. Linux環境でローカル実行する場合は `portaudio19-dev` をインストールしてください
+1. 日本語モデルが存在しない場合、UI起動時に自動でダウンロードされ `./model` に展開されます
+2. オフライン環境では [Vosk](https://alphacephei.com/vosk/models) から日本語モデルを取得し、
+   展開先ディレクトリを `VOSK_MODEL_PATH` 環境変数に設定してください
+3. Linux環境でローカル実行する場合は `portaudio19-dev` をインストールしてください
+4. マイクが無い環境では `PortAudioError: Error querying device` が表示されます。音声
+   入力を利用するにはマイク付きの端末で実行してください
 
 ### APIの直接利用
 
