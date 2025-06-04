@@ -65,7 +65,7 @@ class Voice:
         try:
             audio = audiorecorder(
                 "音声入力",
-                "録音終了",
+                "録音中",
                 start_style={},
                 stop_style={"background-color": "#fdd"},
                 key="voice_recorder",

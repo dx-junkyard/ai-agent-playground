@@ -82,10 +82,10 @@ class ChatUI:
             <script>
             const sendBtn = window.parent.document.querySelector('button[id="send_button"]');
             const observer = new MutationObserver(() => {
-                const stopBtn = Array.from(window.parent.document.querySelectorAll('button')).find(b => b.innerText.includes('録音終了'));
+                const stopBtn = Array.from(window.parent.document.querySelectorAll('button')).find(b => b.innerText.includes('録音中'));
                 if (stopBtn) {
                     if (sendBtn) sendBtn.disabled = true;
-                    stopBtn.style.animation = 'voice-blink 1.5s ease-in-out infinite';
+                    stopBtn.style.animation = 'voice-blink 2s ease-in-out infinite';
                 } else {
                     if (sendBtn) sendBtn.disabled = false;
                 }
