@@ -100,7 +100,11 @@ def main():
         st.session_state["input"] = text
         submit()
         # 送信後はテキストボックスをクリアした状態で表示させるために再実行
-        st.experimental_rerun()
+        rerun = getattr(st, "experimental_rerun", None)
+        if rerun is None:
+            rerun = getattr(st, "rerun", None)
+        if callable(rerun):
+            rerun()
 
     # テキスト入力ウィジェット：ここでは state["input"] が自動的に使われる
     st.text_input("メッセージを入力してください:", key="input")
