@@ -98,7 +98,8 @@ class ChatUI:
                 st.markdown(f"**AI:** {chat['ai']}")
             st.markdown('</div>', unsafe_allow_html=True)
 
-        with st.container() as input_container:
+        input_container = st.container()
+        with input_container:
             input_container.markdown('<div id="input-area">', unsafe_allow_html=True)
             st.text_input(
                 "メッセージを入力してください:",
