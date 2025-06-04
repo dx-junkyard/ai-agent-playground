@@ -95,6 +95,7 @@
 1. [Vosk](https://alphacephei.com/vosk/models) から日本語モデルをダウンロードします
 2. 展開したフォルダーのパスを `VOSK_MODEL_PATH` 環境変数に設定します
 3. UIを起動すると音声認識が利用できます
+4. Linux環境でローカル実行する場合は `portaudio19-dev` をインストールしてください
 
 ### APIの直接利用
 
