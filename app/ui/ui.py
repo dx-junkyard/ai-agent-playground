@@ -1,6 +1,8 @@
 import os
 import queue
 import json
+import shutil
+import zipfile
 import streamlit as st
 import requests
 import sounddevice as sd
@@ -8,12 +10,43 @@ from vosk import Model, KaldiRecognizer
 
 API_URL = "http://api:8000/api/v1/user-message"
 VOSK_MODEL_PATH = os.getenv("VOSK_MODEL_PATH", "model")
+MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-small-ja-0.22.zip"
+
+
+def ensure_vosk_model() -> bool:
+    """Download the Japanese Vosk model if it's not available."""
+    if os.path.isdir(VOSK_MODEL_PATH):
+        return True
+    try:
+        st.info("Downloading Vosk Japanese model...")
+        os.makedirs(VOSK_MODEL_PATH, exist_ok=True)
+        zip_path = os.path.join(VOSK_MODEL_PATH, "model.zip")
+        with requests.get(MODEL_URL, stream=True) as r:
+            r.raise_for_status()
+            with open(zip_path, "wb") as f:
+                for chunk in r.iter_content(chunk_size=8192):
+                    f.write(chunk)
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            zf.extractall(VOSK_MODEL_PATH)
+        os.remove(zip_path)
+
+        # If the model is extracted into a directory, move contents up
+        for item in os.listdir(VOSK_MODEL_PATH):
+            path = os.path.join(VOSK_MODEL_PATH, item)
+            if os.path.isdir(path) and item.startswith("vosk-model"):
+                for f in os.listdir(path):
+                    shutil.move(os.path.join(path, f), VOSK_MODEL_PATH)
+                shutil.rmtree(path)
+                break
+        return True
+    except Exception as e:
+        st.error(f"Vosk model download failed: {e}")
+        return False
 
 
 def recognize_voice(duration: int = 5) -> str:
     """Record audio from microphone and transcribe it using Vosk."""
-    if not os.path.isdir(VOSK_MODEL_PATH):
-        st.error("Vosk model not found. Set VOSK_MODEL_PATH correctly.")
+    if not ensure_vosk_model():
         return ""
 
     model = Model(VOSK_MODEL_PATH)
