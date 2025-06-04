@@ -64,9 +64,9 @@ class ChatUI:
             """
             <style>
             #chat-area {
-                height: calc(100vh - 180px);
+                height: calc(100vh - 140px);
                 overflow-y: auto;
-                padding-bottom: 90px;
+                padding-bottom: 120px;
             }
             #input-area {
                 position: fixed;
@@ -77,6 +77,9 @@ class ChatUI:
                 background: white;
                 padding: 10px 5px;
                 box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+                display: flex;
+                gap: 8px;
+                align-items: center;
                 z-index: 1000;
             }
             @keyframes voice-blink {
