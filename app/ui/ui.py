@@ -94,14 +94,18 @@ def main():
     if "history" not in st.session_state:
         st.session_state.history = []
 
-    # テキスト入力ウィジェット：ここでは state["input"] が自動的に使われる
-    st.text_input("メッセージを入力してください:", key="input")
-
-    st.button("送信", on_click=submit)
+    # 音声入力があればテキストとしてセットして送信
     text = recognize_voice()
     if text:
         st.session_state["input"] = text
         submit()
+        # 送信後はテキストボックスをクリアした状態で表示させるために再実行
+        st.experimental_rerun()
+
+    # テキスト入力ウィジェット：ここでは state["input"] が自動的に使われる
+    st.text_input("メッセージを入力してください:", key="input")
+
+    st.button("送信", on_click=submit)
 
     # 履歴表示
     for chat in st.session_state.history:
