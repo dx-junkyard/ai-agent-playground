@@ -63,9 +63,13 @@ class VoiceInput:
         """Render the audio recorder widget and return the recorded segment."""
         try:
             audio = audiorecorder(
-                "音声入力",
+                "🎤",
                 "録音中",
-                start_style={},
+                start_style={
+                    "background-color": "#eee",
+                    "border": "1px solid #ccc",
+                    "border-radius": "50%",
+                },
                 stop_style={"background-color": "#fdd"},
                 key="voice_recorder",
             )
