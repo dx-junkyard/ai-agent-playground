@@ -125,6 +125,9 @@ curl 'http://localhost:8086/api/v1/user-messages?user_id=me&limit=10'
 - AI応答の表示
 - メッセージ履歴の表示
 
+このUIは、以前HTMLサンプルとして示したチャット画面のレイアウトをStreamlit上で再現しています。
+
+
 ## 拡張アイデア
 
 - ユーザー認証の追加

@@ -2,42 +2,38 @@ import os
 import streamlit as st
 import requests
 
-API_URL = "http://api:8000/api/v1/user-message"
+API_URL = os.environ.get("API_URL", "http://api:8000/api/v1/user-message")
 
-def send_message(msg: str) -> str:
+st.set_page_config(page_title="AI チャットアプリ", page_icon="🤖")
+
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {"role": "assistant", "content": "こんにちは！チャットへようこそ。"}
+    ]
+
+
+def call_api(text: str) -> str:
     try:
-        resp = requests.post(API_URL, json={"message": msg})
+        resp = requests.post(API_URL, json={"message": text})
         resp.raise_for_status()
         return resp.text.strip()
     except Exception as e:
         st.error(f"送信エラー: {e}")
-        return ""
+        return "エラーが発生しました"
 
-def submit():
-    msg = st.session_state["input"]
-    if msg:
-        ai = send_message(msg)
-        st.session_state.history.append({"user": msg, "ai": ai})
-    else:
-        st.warning("メッセージを入力してください。")
-    # ← ここでのみ input をクリア
-    st.session_state["input"] = ""
 
-def main():
-    st.set_page_config(page_title="AI チャットアプリ", page_icon="🤖")
-    if "history" not in st.session_state:
-        st.session_state.history = []
+for m in st.session_state.messages:
+    with st.chat_message("user" if m["role"] == "user" else "ai"):
+        st.markdown(m["content"])
 
-    # テキスト入力ウィジェット：ここでは state["input"] が自動的に使われる
-    st.text_input("メッセージを入力してください:", key="input")
+prompt = st.chat_input("メッセージを入力...")
 
-    # ボタンにコールバックを登録
-    st.button("送信", on_click=submit)
+if prompt:
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
 
-    # 履歴表示
-    for chat in st.session_state.history:
-        st.markdown(f"**あなた:** {chat['user']}")
-        st.markdown(f"**AI:** {chat['ai']}")
-
-if __name__ == "__main__":
-    main()
+    reply = call_api(prompt)
+    st.session_state.messages.append({"role": "assistant", "content": reply})
+    with st.chat_message("ai"):
+        st.markdown(reply)
