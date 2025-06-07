@@ -30,6 +30,6 @@ class AudioOutput:
             return
         try:
             audio = self._synthesize(text)
-            st.audio(audio, format="audio/wav")
+            st.audio(audio, format="audio/wav", autoplay=True)
         except Exception as e:
             st.error(f"音声生成失敗: {e}")
