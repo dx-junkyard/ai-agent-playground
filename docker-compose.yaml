@@ -19,6 +19,12 @@ services:
     volumes:
       - .:/app
 
+  voicebox:
+    image: voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+    ports:
+      - "50021:50021"
+    restart: unless-stopped
+
   db:
     image: mysql:8.0
     environment:
@@ -29,4 +35,4 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./mysql/db:/docker-entrypoint-initdb.d 
+      - ./mysql/db:/docker-entrypoint-initdb.d

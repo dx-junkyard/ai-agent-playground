@@ -1,25 +1,35 @@
-import json
+import os
+import requests
 import streamlit as st
 
 
 class AudioOutput:
-    """Utility for speaking text via the browser using Web Speech API."""
+    """Generate speech using VOICEVOX (VoiceBox) engine and play it."""
 
-    @staticmethod
-    def speak(text: str, lang: str = "ja-JP") -> None:
-        """Speak the given text using the browser's speech synthesis."""
+    def __init__(self, base_url: str = None, speaker: int = 1) -> None:
+        self.base_url = base_url or os.environ.get("VOICEBOX_URL", "http://voicebox:50021")
+        self.speaker = speaker
+
+    def _synthesize(self, text: str) -> bytes:
+        """Request VOICEVOX to synthesize speech and return WAV bytes."""
+        query = requests.post(
+            f"{self.base_url}/audio_query",
+            params={"speaker": self.speaker, "text": text},
+        )
+        query.raise_for_status()
+        synthesis = requests.post(
+            f"{self.base_url}/synthesis",
+            params={"speaker": self.speaker},
+            json=query.json(),
+        )
+        synthesis.raise_for_status()
+        return synthesis.content
+
+    def speak(self, text: str) -> None:
         if not text:
             return
-        escaped = json.dumps(text)
-        st.components.v1.html(
-            f"""
-            <script>
-            var utt = new SpeechSynthesisUtterance({escaped});
-            utt.lang = '{lang}';
-            window.speechSynthesis.cancel();
-            window.speechSynthesis.speak(utt);
-            </script>
-            """,
-            height=0,
-        )
-
+        try:
+            audio = self._synthesize(text)
+            st.audio(audio, format="audio/wav")
+        except Exception as e:
+            st.error(f"音声生成失敗: {e}")
