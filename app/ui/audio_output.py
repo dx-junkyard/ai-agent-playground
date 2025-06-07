@@ -1,14 +1,19 @@
 import os
 import requests
 import streamlit as st
+from dotenv import load_dotenv
+
+
+load_dotenv()
 
 
 class AudioOutput:
     """Generate speech using VOICEVOX (VoiceBox) engine and play it."""
 
-    def __init__(self, base_url: str = None, speaker: int = 1) -> None:
+    def __init__(self, base_url: str = None, speaker: int | None = None) -> None:
         self.base_url = base_url or os.environ.get("VOICEBOX_URL", "http://voicebox:50021")
-        self.speaker = speaker
+        env_speaker = os.environ.get("VOICEBOX_SPEAKER")
+        self.speaker = speaker if speaker is not None else int(env_speaker) if env_speaker is not None else 1
 
     def _synthesize(self, text: str) -> bytes:
         """Request VOICEVOX to synthesize speech and return WAV bytes."""
