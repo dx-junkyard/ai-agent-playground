@@ -75,7 +75,9 @@
     ```
 
 2. **環境構築**
-    - 必要な環境変数を設定
+    - `.env.example` をコピーして `.env` を作成し、`OPENAI_API_KEY` などの環境変数を設定します
+      - `VOICEBOX_SPEAKER` や `VOICEBOX_SPEED` もこのファイルに記述します
+      - `docker compose up` を実行するとコンテナ内から自動的に読み込まれるため、`docker-compose.yaml` に環境変数を追加する必要はありません
     - 依存パッケージのインストール
 
 3. **アプリケーションの起動**
@@ -110,7 +112,9 @@
 #### 音声出力について
 VOICEVOX コンテナを利用して音声を生成し、ブラウザ上で再生します。
 `docker compose up` を実行すると自動で起動します。
-`VOICEBOX_SPEAKER` 環境変数に VOICEVOX の speaker ID を設定することで使用する声色を選択できます（デフォルト: `1`）。
+`VOICEBOX_SPEAKER` や `VOICEBOX_SPEED` は `.env` に記述した値がアプリケーション起動時に読み込まれます。
+`VOICEBOX_SPEAKER` では VOICEVOX の speaker ID を設定して使用する声色を選択できます（デフォルト: `1`）。
+`VOICEBOX_SPEED` を変更すると生成される音声のスピードを調整できます（デフォルト: `1.0`）。1 より大きい値で速く、0.5 など 1 未満でゆっくりになります。
 
 ### APIの直接利用
 
