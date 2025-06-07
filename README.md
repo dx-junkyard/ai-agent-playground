@@ -110,6 +110,7 @@
 #### 音声出力について
 VOICEVOX コンテナを利用して音声を生成し、ブラウザ上で再生します。
 `docker compose up` を実行すると自動で起動します。
+`VOICEBOX_SPEAKER` 環境変数に VOICEVOX の speaker ID を設定することで使用する声色を選択できます（デフォルト: `1`）。
 
 ### APIの直接利用
 
