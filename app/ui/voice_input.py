@@ -5,14 +5,14 @@ import tempfile
 import streamlit as st
 from audiorecorder import audiorecorder
 from dotenv import load_dotenv
-import openai
+from openai import OpenAI
 from pydub import AudioSegment
 
 logger = logging.getLogger(__name__)
 
 # Load environment variables from .env if available
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY", "")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
 
 
 class VoiceInput:
@@ -52,8 +52,13 @@ class VoiceInput:
             tmp.seek(0)
             with st.spinner("音声認識中..."):
                 try:
-                    result = openai.Audio.transcribe("whisper-1", tmp, language="ja")
-                    text = result.get("text", "")
+                    with open(tmp.name, "rb") as f:
+                        result = client.audio.transcriptions.create(
+                            model="whisper-1",
+                            file=f,
+                            language="ja",
+                        )
+                    text = result.text
                 except Exception as e:
                     st.error(f"音声認識失敗: {e}")
                     logger.error("Whisper API error: %s", e)
