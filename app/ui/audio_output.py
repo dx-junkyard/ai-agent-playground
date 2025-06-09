@@ -9,13 +9,13 @@ load_dotenv()
 
 
 class AudioOutput:
-    """Generate speech using VOICEVOX (VoiceBox) engine and play it."""
+    """Generate speech using VOICEVOX engine and play it."""
 
     def __init__(self, base_url: str = None, speaker: Optional[int] = None, speed: Optional[float] = None) -> None:
-        self.base_url = base_url or os.environ.get("VOICEBOX_URL", "http://voicebox:50021")
-        env_speaker = os.environ.get("VOICEBOX_SPEAKER")
+        self.base_url = base_url or os.environ.get("VOICEVOX_URL", "http://voicevox:50021")
+        env_speaker = os.environ.get("VOICEVOX_SPEAKER")
         self.speaker = speaker if speaker is not None else int(env_speaker) if env_speaker is not None else 1
-        env_speed = os.environ.get("VOICEBOX_SPEED")
+        env_speed = os.environ.get("VOICEVOX_SPEED")
         self.speed = speed if speed is not None else float(env_speed) if env_speed is not None else 1.0
 
     def _synthesize(self, text: str) -> bytes:

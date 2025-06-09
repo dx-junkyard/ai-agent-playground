@@ -18,6 +18,6 @@ DB_NAME = "mydb"
 
 DB_PORT = 3306
 
-# VOICEBOXエンジンのURL
-VOICEBOX_URL = "http://voicebox:50021"
+# VOICEVOXエンジンのURL
+VOICEVOX_URL = "http://voicevox:50021"
 
