@@ -24,7 +24,7 @@
 │       ├── ui.py              # UIアプリケーション
 │       ├── voice_input.py     # 音声入力機能
 │       └── audio_output.py    # 音声出力機能
-├── voicebox/                  # VOICEVOX エンジンコンテナ
+├── voicevox/                  # VOICEVOX エンジンコンテナ
 ├── mysql/                     # MySQLデータベース関連
 │   └── db/user_messages.sql   # テーブル定義(DDL)
 ├── config.py                  # 設定ファイル
@@ -76,7 +76,7 @@
 
 2. **環境構築**
     - `.env.example` をコピーして `.env` を作成し、`OPENAI_API_KEY` などの環境変数を設定します
-      - `VOICEBOX_SPEAKER` や `VOICEBOX_SPEED` もこのファイルに記述します
+      - `VOICEVOX_SPEAKER` や `VOICEVOX_SPEED` もこのファイルに記述します
       - `docker compose up` を実行するとコンテナ内から自動的に読み込まれるため、`docker-compose.yaml` に環境変数を追加する必要はありません
     - 依存パッケージのインストール
 
@@ -112,9 +112,9 @@
 #### 音声出力について
 VOICEVOX コンテナを利用して音声を生成し、ブラウザ上で再生します。
 `docker compose up` を実行すると自動で起動します。
-`VOICEBOX_SPEAKER` や `VOICEBOX_SPEED` は `.env` に記述した値がアプリケーション起動時に読み込まれます。
-`VOICEBOX_SPEAKER` では VOICEVOX の speaker ID を設定して使用する声色を選択できます（デフォルト: `1`）。
-`VOICEBOX_SPEED` を変更すると生成される音声のスピードを調整できます（デフォルト: `1.0`）。1 より大きい値で速く、0.5 など 1 未満でゆっくりになります。
+`VOICEVOX_SPEAKER` や `VOICEVOX_SPEED` は `.env` に記述した値がアプリケーション起動時に読み込まれます。
+`VOICEVOX_SPEAKER` では VOICEVOX の speaker ID を設定して使用する声色を選択できます（デフォルト: `1`）。
+`VOICEVOX_SPEED` を変更すると生成される音声のスピードを調整できます（デフォルト: `1.0`）。1 より大きい値で速く、0.5 など 1 未満でゆっくりになります。
 
 ### APIの直接利用
 
