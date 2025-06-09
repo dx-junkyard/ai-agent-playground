@@ -135,6 +135,24 @@ curl http://localhost:8086/api/v1/user-message \
 curl 'http://localhost:8086/api/v1/user-messages?user_id=me&limit=10'
 ```
 
+#### ブラウジング情報の送信
+
+Chrome 拡張 [curiosity-capture](https://github.com/dx-junkyard/curiosity-capture-chrome-extension) から送られるページ閲覧データを受け取るエンドポイントです。
+
+```bash
+curl http://localhost:8086/api/v1/user-actions \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "title": "Example",
+    "text": "page text",
+    "scroll_depth": 0.5,
+    "visit_start": "2024-01-01T00:00:00Z",
+    "visit_end": "2024-01-01T00:05:00Z"
+  }'
+```
+
 ## 開発
 
 ### バックエンド（FastAPI）
