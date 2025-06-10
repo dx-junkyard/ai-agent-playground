@@ -7,6 +7,7 @@ import logging
 from app.api.ai import AIClient
 from app.api.db import DBClient
 from app.api.message_queue import publish_message
+from config import MQ_RAW_QUEUE
 
 app = FastAPI()
 
@@ -39,7 +40,7 @@ async def post_user_actions(request: Request) -> dict:
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
 
-    publish_message(data)
+    publish_message(MQ_RAW_QUEUE, data)
     return {"status": "queued"}
 
 @app.get("/api/v1/user-messages")

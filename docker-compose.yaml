@@ -51,3 +51,12 @@ services:
     depends_on:
       - rabbitmq
       - db
+
+  processor:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    command: ["python", "app/api/summarize_worker.py"]
+    depends_on:
+      - rabbitmq
+      - db

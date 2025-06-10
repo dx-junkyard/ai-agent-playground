@@ -43,7 +43,10 @@
 - Streamlitフロントエンド: ユーザーインターフェースの提供
 - データベース連携: 会話履歴の保存と取得
 - 音声入出力: マイク録音と VOICEVOX による音声生成
-- RabbitMQ とワーカー: ブラウジング情報をキューイングし、解析後に DB へ保存
+- RabbitMQ と 2 つのワーカー:
+  - 生データを受け取るプロセッサーが OpenAI API で要約・分類し次のキューへ転送
+  - 解析済みデータを受け取るワーカーが MySQL へ保存
+  - 分類に使用する root カテゴリーは `config.py` の `ROOT_CATEGORIES` に固定化
 
 ## 実装のポイント
 
@@ -78,7 +81,7 @@
 2. **環境構築**
     - `.env.example` をコピーして `.env` を作成し、`OPENAI_API_KEY` などの環境変数を設定します
       - `VOICEVOX_SPEAKER` や `VOICEVOX_SPEED` もこのファイルに記述します
-      - `MQ_HOST` と `MQ_QUEUE` は RabbitMQ 接続先とキュー名を指定します（デフォルトは `rabbitmq` と `user_actions`）
+      - `MQ_HOST` と `MQ_RAW_QUEUE`、`MQ_PROCESSED_QUEUE` を設定します（デフォルトは `rabbitmq`、`raw_actions`、`processed_actions`）
       - `docker compose up` を実行するとコンテナ内から自動的に読み込まれるため、`docker-compose.yaml` に環境変数を追加する必要はありません
     - 依存パッケージのインストール
 
