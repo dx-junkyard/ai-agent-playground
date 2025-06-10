@@ -1,4 +1,4 @@
-CREATE TABLE browsing_logs (
+CREATE TABLE IF NOT EXISTS browsing_logs (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     user_id VARCHAR(255),
     session_id VARCHAR(255),

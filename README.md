@@ -138,6 +138,7 @@ curl 'http://localhost:8086/api/v1/user-messages?user_id=me&limit=10'
 #### ブラウジング情報の送信
 
 Chrome 拡張 [curiosity-capture](https://github.com/dx-junkyard/curiosity-capture-chrome-extension) から送られるページ閲覧データを受け取るエンドポイントです。
+初回起動時に `browsing_logs` テーブルが存在しない場合は API 側で自動的に作成されます。
 
 ```bash
 curl http://localhost:8086/api/v1/user-actions \
