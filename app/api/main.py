@@ -6,6 +6,7 @@ import logging
 # config.pyからトークンやAPIエンドポイントをインポート
 from app.api.ai import AIClient
 from app.api.db import DBClient
+from app.api.browsing_recorder import BrowsingRecorder
 
 app = FastAPI()
 
@@ -29,6 +30,18 @@ async def post_usermessage(request: Request) -> str:
     repo.insert_message("me",message)
     repo.insert_message("ai",ai_response)
     return ai_response
+
+@app.post("/api/v1/user-actions")
+async def post_user_actions(request: Request) -> dict:
+    """Receive browsing data from Chrome extension."""
+    try:
+        data = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    recorder = BrowsingRecorder()
+    recorder.insert_action(data)
+    return {"status": "ok"}
 
 @app.get("/api/v1/user-messages")
 async def get_user_messages(user_id: str = Query(..., description="ユーザーID"), limit: int = Query(10, ge=1, le=100, description="取得件数")) -> List[Dict]:
