@@ -1,5 +1,6 @@
 import mysql.connector
-from typing import Dict, Any
+from typing import Dict, Any, Optional
+from datetime import datetime
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT
 
 class BrowsingRecorder:
@@ -50,6 +51,15 @@ class BrowsingRecorder:
             if conn:
                 conn.close()
 
+    def _parse_datetime(self, value: Optional[str]) -> Optional[datetime]:
+        """Convert ISO8601 string to naive datetime for MySQL."""
+        if not value:
+            return None
+        try:
+            return datetime.fromisoformat(value.replace('Z', '+00:00')).replace(tzinfo=None)
+        except ValueError:
+            return None
+
     def insert_action(self, data: Dict[str, Any]) -> None:
         """Insert browsing action data into browsing_logs table."""
         conn = None
@@ -74,15 +84,24 @@ class BrowsingRecorder:
             keywords = data.get('keywords')
             if isinstance(keywords, list):
                 keywords = ','.join(keywords)
+
+            scroll_depth = data.get('scroll_depth')
+            if scroll_depth is None:
+                scroll_depth = data.get('scrollDepth')
+            try:
+                scroll_depth = float(scroll_depth) if scroll_depth is not None else None
+            except (ValueError, TypeError):
+                scroll_depth = None
+
             values = (
                 data.get('user_id'),
                 data.get('session_id'),
                 data.get('url'),
                 data.get('title'),
                 data.get('text'),
-                data.get('scroll_depth'),
-                data.get('visit_start'),
-                data.get('visit_end'),
+                scroll_depth,
+                self._parse_datetime(data.get('visit_start')),
+                self._parse_datetime(data.get('visit_end')),
                 keywords,
                 data.get('search_query')
             )

@@ -148,7 +148,7 @@ curl http://localhost:8086/api/v1/user-actions \
     "url": "https://example.com",
     "title": "Example",
     "text": "page text",
-    "scroll_depth": 0.5,
+    "scrollDepth": 0.5,
     "visit_start": "2024-01-01T00:00:00Z",
     "visit_end": "2024-01-01T00:05:00Z"
   }'
