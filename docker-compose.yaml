@@ -36,3 +36,18 @@ services:
       - "3306:3306"
     volumes:
       - ./mysql/db:/docker-entrypoint-initdb.d
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    command: ["python", "app/api/action_worker.py"]
+    depends_on:
+      - rabbitmq
+      - db

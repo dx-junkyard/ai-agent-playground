@@ -21,3 +21,7 @@ DB_PORT = 3306
 # VOICEVOXエンジンのURL
 VOICEVOX_URL = "http://voicevox:50021"
 
+# RabbitMQ settings
+MQ_HOST = "rabbitmq"
+MQ_QUEUE = "user_actions"
+
