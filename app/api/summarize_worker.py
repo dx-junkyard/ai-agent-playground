@@ -44,7 +44,12 @@ def analyze_action(data: dict) -> dict:
 
 
 def main() -> None:
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=MQ_HOST))
+    params = pika.ConnectionParameters(
+        host=MQ_HOST,
+        connection_attempts=5,
+        retry_delay=5,
+    )
+    connection = pika.BlockingConnection(params)
     channel = connection.channel()
     channel.queue_declare(queue=MQ_RAW_QUEUE, durable=True)
     channel.queue_declare(queue=MQ_PROCESSED_QUEUE, durable=True)
@@ -54,7 +59,12 @@ def main() -> None:
         analyzed = analyze_action(data)
         data.update(analyzed)
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        publish_connection = pika.BlockingConnection(pika.ConnectionParameters(host=MQ_HOST))
+        publish_params = pika.ConnectionParameters(
+            host=MQ_HOST,
+            connection_attempts=5,
+            retry_delay=5,
+        )
+        publish_connection = pika.BlockingConnection(publish_params)
         publish_channel = publish_connection.channel()
         publish_channel.queue_declare(queue=MQ_PROCESSED_QUEUE, durable=True)
         publish_channel.basic_publish(
