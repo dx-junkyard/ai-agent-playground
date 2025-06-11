@@ -42,13 +42,14 @@ class AIClient:
         logger.info(f"Prompt sent to LLM: {prompt}")
 
         try:
-            response = requests.post(self.api_url, json={
-                "model": self.model,
-                "prompt": prompt,
-                "stream": False
-            })
+            response = requests.post(
+                self.api_url,
+                json={"model": self.model, "prompt": prompt, "stream": False},
+            )
             response.raise_for_status()
-            return response.json().get("response", "").strip()
+            ai_text = response.json().get("response", "").strip()
+            logger.info("LLM response: %s", ai_text)
+            return ai_text
         except Exception as e:
             logging.error(f"[✗] 返答生成失敗: {e}")
             return "すみません、AIが回答できませんでした。"

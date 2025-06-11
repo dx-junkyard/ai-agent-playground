@@ -2,6 +2,7 @@ import requests
 from fastapi import FastAPI, Request, HTTPException, Query
 from typing import Dict, List
 import logging
+from pathlib import Path
 
 # config.pyからトークンやAPIエンドポイントをインポート
 from app.api.ai import AIClient
@@ -14,6 +15,12 @@ app = FastAPI()
 # ログ設定
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+log_dir = Path(__file__).resolve().parents[2] / "logs"
+log_dir.mkdir(exist_ok=True)
+fh = logging.FileHandler(log_dir / "ai_responses.log")
+fh.setLevel(logging.INFO)
+fh.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
+logger.addHandler(fh)
 
 # LINEのWebhookエンドポイント
 @app.post("/api/v1/user-message")
