@@ -1,17 +1,15 @@
 import json
 import logging
-import os
 import pika
-from dotenv import load_dotenv
-from openai import OpenAI
+
+from app.api.ai import AIClient
 
 from config import MQ_HOST, MQ_RAW_QUEUE, MQ_PROCESSED_QUEUE, ROOT_CATEGORIES
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-load_dotenv()
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+ai_client = AIClient()
 
 PROMPT_TEMPLATE = """
 次のWebページ内容を短く日本語で要約し、root_categoriesから適切なものを選んでサブカテゴリー名を1つずつ推測してください。JSONのみ出力してください。
@@ -35,8 +33,8 @@ def analyze_action(data: dict) -> dict:
     text = data.get("text", "")[:1000]
     prompt = PROMPT_TEMPLATE.format(title=title, text=text, roots=ROOT_CATEGORIES)
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+        response = ai_client.client.chat.completions.create(
+            model=ai_client.model,
             messages=[{"role": "user", "content": prompt}],
         )
         content = response.choices[0].message.content
