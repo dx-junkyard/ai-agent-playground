@@ -1,7 +1,10 @@
-import requests
+import os
 import logging
 from pathlib import Path
-from config import AI_MODEL, AI_URL
+from dotenv import load_dotenv
+from openai import OpenAI
+from typing import Optional
+from config import AI_MODEL
 
 # ログ設定（必要に応じてレベルを DEBUG に変更可能）
 logging.basicConfig(
@@ -17,12 +20,13 @@ class AIClient:
 
     PROMPT_PATH = Path(__file__).resolve().parents[2] / "static" / "prompt.txt"
 
-    def __init__(self, model: str = AI_MODEL, base_url: str = AI_URL, prompt_path: Path = None):
+    def __init__(self, model: str = AI_MODEL, prompt_path: Optional[Path] = None):
+        load_dotenv()
         self.model = model
-        self.api_url = f"{base_url}/api/generate"
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
         self.prompt_path = Path(prompt_path) if prompt_path else self.PROMPT_PATH
         logging.info(
-            f"AIClient initialized with model: {model} and endpoint: {self.api_url}, prompt: {self.prompt_path}"
+            f"AIClient initialized with model: {model} and prompt: {self.prompt_path}"
         )
 
     def _load_prompt(self) -> str:
@@ -42,13 +46,13 @@ class AIClient:
         logger.info(f"Prompt sent to LLM: {prompt}")
 
         try:
-            response = requests.post(self.api_url, json={
-                "model": self.model,
-                "prompt": prompt,
-                "stream": False
-            })
-            response.raise_for_status()
-            return response.json().get("response", "").strip()
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            ai_text = response.choices[0].message.content.strip()
+            logger.info("LLM response: %s", ai_text)
+            return ai_text
         except Exception as e:
             logging.error(f"[✗] 返答生成失敗: {e}")
             return "すみません、AIが回答できませんでした。"

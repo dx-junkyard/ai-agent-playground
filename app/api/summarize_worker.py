@@ -2,14 +2,16 @@ import json
 import logging
 import os
 import pika
-import openai
+from dotenv import load_dotenv
+from openai import OpenAI
 
 from config import MQ_HOST, MQ_RAW_QUEUE, MQ_PROCESSED_QUEUE, ROOT_CATEGORIES
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+load_dotenv()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
 
 PROMPT_TEMPLATE = """
 次のWebページ内容を短く日本語で要約し、root_categoriesから適切なものを選んでサブカテゴリー名を1つずつ推測してください。JSONのみ出力してください。
@@ -33,8 +35,9 @@ def analyze_action(data: dict) -> dict:
     text = data.get("text", "")[:1000]
     prompt = PROMPT_TEMPLATE.format(title=title, text=text, roots=ROOT_CATEGORIES)
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo", messages=[{"role": "user", "content": prompt}]
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": prompt}],
         )
         content = response.choices[0].message.content
         return json.loads(content)
@@ -44,7 +47,12 @@ def analyze_action(data: dict) -> dict:
 
 
 def main() -> None:
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=MQ_HOST))
+    params = pika.ConnectionParameters(
+        host=MQ_HOST,
+        connection_attempts=5,
+        retry_delay=5,
+    )
+    connection = pika.BlockingConnection(params)
     channel = connection.channel()
     channel.queue_declare(queue=MQ_RAW_QUEUE, durable=True)
     channel.queue_declare(queue=MQ_PROCESSED_QUEUE, durable=True)
@@ -54,7 +62,12 @@ def main() -> None:
         analyzed = analyze_action(data)
         data.update(analyzed)
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        publish_connection = pika.BlockingConnection(pika.ConnectionParameters(host=MQ_HOST))
+        publish_params = pika.ConnectionParameters(
+            host=MQ_HOST,
+            connection_attempts=5,
+            retry_delay=5,
+        )
+        publish_connection = pika.BlockingConnection(publish_params)
         publish_channel = publish_connection.channel()
         publish_channel.queue_declare(queue=MQ_PROCESSED_QUEUE, durable=True)
         publish_channel.basic_publish(

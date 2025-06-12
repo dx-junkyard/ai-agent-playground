@@ -10,7 +10,12 @@ logger = logging.getLogger(__name__)
 
 def main() -> None:
     recorder = BrowsingRecorder()
-    connection = pika.BlockingConnection(pika.ConnectionParameters(host=MQ_HOST))
+    params = pika.ConnectionParameters(
+        host=MQ_HOST,
+        connection_attempts=5,
+        retry_delay=5,
+    )
+    connection = pika.BlockingConnection(params)
     channel = connection.channel()
     channel.queue_declare(queue=MQ_PROCESSED_QUEUE, durable=True)
 
