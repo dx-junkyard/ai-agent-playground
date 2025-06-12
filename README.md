@@ -26,7 +26,10 @@
 │       └── audio_output.py    # 音声出力機能
 ├── voicevox/                  # VOICEVOX エンジンコンテナ
 ├── mysql/                     # MySQLデータベース関連
-│   └── db/user_messages.sql   # テーブル定義(DDL)
+│   └── db/
+│       ├── schema.sql               # テーブル定義
+│       ├── user_messages.sql        # メッセージ保存テーブル
+│       └── seed_root_categories.sql # カテゴリー初期データ
 ├── config.py                  # 設定ファイル
 ├── requirements.api.txt       # API依存関係
 ├── requirements.ui.txt        # UI依存関係
