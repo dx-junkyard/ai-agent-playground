@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import pika
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -40,7 +41,12 @@ def analyze_action(data: dict) -> dict:
             model=ai_model,
             messages=[{"role": "user", "content": prompt}],
         )
-        content = response.choices[0].message.content
+        logger.info("OpenAI API response: %s", response)
+        content = response.choices[0].message.content.strip()
+        if content.startswith("```"):
+            content = re.sub(r'^```(?:json)?\s*', '', content, flags=re.IGNORECASE)
+            content = re.sub(r'\s*```$', '', content)
+            content = content.strip()
         return json.loads(content)
     except Exception as exc:
         logger.error(f"OpenAI API error: {exc}")
