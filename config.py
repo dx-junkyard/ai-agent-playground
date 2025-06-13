@@ -4,9 +4,10 @@
 # LINEチャネルアクセストークン（LINE Developersで発行されたトークン）
 LINE_CHANNEL_ACCESS_TOKEN = "basicコースでは使いません"
 
-AI_MODEL = "schroneko/llama-3.1-swallow-8b-instruct-v0.1:latest"
+#AI_MODEL = "schroneko/llama-3.1-swallow-8b-instruct-v0.1:latest"
+AI_MODEL = "gpt-4o"
 
-AI_URL = "http://host.docker.internal:11434"
+#AI_URL = "http://host.docker.internal:11434"
 
 DB_HOST = "db"
 
