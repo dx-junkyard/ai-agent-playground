@@ -4,7 +4,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from openai import OpenAI
 from typing import Optional
-from config import AI_MODEL, AI_URL
+from config import AI_MODEL
 
 # ログ設定（必要に応じてレベルを DEBUG に変更可能）
 logging.basicConfig(
@@ -20,13 +20,13 @@ class AIClient:
 
     PROMPT_PATH = Path(__file__).resolve().parents[2] / "static" / "prompt.txt"
 
-    def __init__(self, model: str = AI_MODEL, base_url: str = AI_URL, prompt_path: Optional[Path] = None):
+    def __init__(self, model: str = AI_MODEL, prompt_path: Optional[Path] = None):
         load_dotenv()
         self.model = model
-        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""), base_url=base_url)
+        self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
         self.prompt_path = Path(prompt_path) if prompt_path else self.PROMPT_PATH
         logging.info(
-            f"AIClient initialized with model: {model}, base_url: {base_url}, prompt: {self.prompt_path}"
+            f"AIClient initialized with model: {model} and prompt: {self.prompt_path}"
         )
 
     def _load_prompt(self) -> str:
