@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
+ai_model = os.getenv("AI_MODEL", "gpt-4o")
 
 PROMPT_TEMPLATE = """
 次のWebページ内容を短く日本語で要約し、root_categoriesから適切なものを選んでサブカテゴリー名を1つずつ推測してください。JSONのみ出力してください。
@@ -36,7 +37,7 @@ def analyze_action(data: dict) -> dict:
     prompt = PROMPT_TEMPLATE.format(title=title, text=text, roots=ROOT_CATEGORIES)
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=ai_model,
             messages=[{"role": "user", "content": prompt}],
         )
         content = response.choices[0].message.content
