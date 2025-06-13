@@ -1,7 +1,18 @@
 import mysql.connector
+import logging
 from typing import Dict, Any, Optional
 from datetime import datetime
+from pathlib import Path
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, ROOT_CATEGORIES
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+log_dir = Path(__file__).resolve().parents[2] / "logs"
+log_dir.mkdir(exist_ok=True)
+fh = logging.FileHandler(log_dir / "db_actions.log")
+fh.setLevel(logging.INFO)
+fh.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
+logger.addHandler(fh)
 
 class BrowsingRecorder:
     """Receive browsing data from Chrome extension and store it in MySQL."""
@@ -83,7 +94,7 @@ class BrowsingRecorder:
                 )
             conn.commit()
         except mysql.connector.Error as err:
-            print(f"[✗] MySQL Error: {err}")
+            logger.error("[✗] MySQL Error: %s", err)
         finally:
             if cursor:
                 cursor.close()
@@ -158,7 +169,11 @@ class BrowsingRecorder:
                     )
                     root_row = cursor.fetchone()
                     if not root_row:
-                        print(f"[✗] root='{root_name}' sub='{sub_name}' root category not found")
+                        logger.warning(
+                            "[✗] root='%s' sub='%s' root category not found",
+                            root_name,
+                            sub_name,
+                        )
                         continue
                     root_id = root_row[0]
                     cursor.execute(
@@ -178,13 +193,22 @@ class BrowsingRecorder:
                         "INSERT IGNORE INTO log_sub_categories(log_id, sub_id) VALUES (%s,%s)",
                         (log_id, sub_id),
                     )
-                    print(f"[✓] stored root='{root_name}', sub='{sub_name}'")
+                    logger.info(
+                        "[✓] stored root='%s', sub='%s'",
+                        root_name,
+                        sub_name,
+                    )
                 except mysql.connector.Error as err:
-                    print(f"[✗] root='{root_name}' sub='{sub_name}' {err}")
+                    logger.error(
+                        "[✗] root='%s' sub='%s' %s",
+                        root_name,
+                        sub_name,
+                        err,
+                    )
             conn.commit()
-            print("[✓] Inserted browsing log")
+            logger.info("[✓] Inserted browsing log")
         except mysql.connector.Error as err:
-            print(f"[✗] MySQL Error: {err}")
+            logger.error("[✗] MySQL Error: %s", err)
         finally:
             if cursor:
                 cursor.close()
