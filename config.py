@@ -5,6 +5,7 @@
 LINE_CHANNEL_ACCESS_TOKEN = "basicコースでは使いません"
 
 AI_MODEL = "gpt-4o"
+AI_URL = "https://api.openai.com/v1"
 
 DB_HOST = "db"
 
