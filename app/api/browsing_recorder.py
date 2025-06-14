@@ -1,7 +1,12 @@
+import json
+import logging
 import mysql.connector
 from typing import Dict, Any, Optional
 from datetime import datetime
 from config import DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, ROOT_CATEGORIES
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class BrowsingRecorder:
     """Receive browsing data from Chrome extension and store it in MySQL."""
@@ -144,46 +149,51 @@ class BrowsingRecorder:
                 keywords,
                 data.get('search_query')
             )
+            logger.info(
+                "Insert log url=%s title=%s summary=%s labels=%s",
+                data.get('url'),
+                data.get('title'),
+                data.get('summary'),
+                json.dumps(data.get('labels', []), ensure_ascii=False),
+            )
             cursor.execute(query, values)
             log_id = cursor.lastrowid
             labels = data.get('labels', [])
             for label in labels:
-                roots = label.get('root') or label.get('roots') or []
+                root_name = label.get('root')
                 subs = label.get('sub') or label.get('subs') or []
-                if isinstance(roots, str):
-                    roots = [roots]
                 if isinstance(subs, str):
                     subs = [subs]
-                for root_name in roots:
-                    if not root_name:
+                if not root_name:
+                    continue
+                cursor.execute(
+                    "SELECT id FROM root_categories WHERE name=%s",
+                    (root_name,),
+                )
+                root_row = cursor.fetchone()
+                if not root_row:
+                    continue
+                root_id = root_row[0]
+                for sub_name in subs:
+                    if not sub_name:
                         continue
                     cursor.execute(
-                        "SELECT id FROM root_categories WHERE name=%s", (root_name,)
+                        "SELECT id FROM sub_categories WHERE root_id=%s AND name=%s",
+                        (root_id, sub_name),
                     )
-                    root_row = cursor.fetchone()
-                    if not root_row:
-                        continue
-                    root_id = root_row[0]
-                    for sub_name in subs:
-                        if not sub_name:
-                            continue
+                    row = cursor.fetchone()
+                    if row:
+                        sub_id = row[0]
+                    else:
                         cursor.execute(
-                            "SELECT id FROM sub_categories WHERE root_id=%s AND name=%s",
+                            "INSERT INTO sub_categories(root_id, name) VALUES (%s,%s)",
                             (root_id, sub_name),
                         )
-                        row = cursor.fetchone()
-                        if row:
-                            sub_id = row[0]
-                        else:
-                            cursor.execute(
-                                "INSERT INTO sub_categories(root_id, name) VALUES (%s,%s)",
-                                (root_id, sub_name),
-                            )
-                            sub_id = cursor.lastrowid
-                        cursor.execute(
-                            "INSERT IGNORE INTO log_sub_categories(log_id, sub_id) VALUES (%s,%s)",
-                            (log_id, sub_id),
-                        )
+                        sub_id = cursor.lastrowid
+                    cursor.execute(
+                        "INSERT IGNORE INTO log_sub_categories(log_id, sub_id) VALUES (%s,%s)",
+                        (log_id, sub_id),
+                    )
             conn.commit()
             print("[✓] Inserted browsing log")
         except mysql.connector.Error as err:
