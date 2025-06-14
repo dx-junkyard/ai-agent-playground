@@ -16,14 +16,16 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
 ai_model = os.getenv("AI_MODEL", "gpt-4o")
 
 PROMPT_TEMPLATE = """
-次のWebページ内容を短く日本語で要約し、root_categoriesから適切なものを選んでサブカテゴリー名を1つずつ推測してください。JSONのみ出力してください。
+次のWebページ内容について、特徴的な主張や関連する要素が分かるように日本語で要約してください。
+あわせて、root_categories から該当するものを複数選び、対応するサブカテゴリー名も推測してください。
+JSON のみを出力してください。
 
 root_categories = {roots}
 
 # 出力フォーマット
 {{
   "summary": "...",
-  "labels": [{{"root": "...", "sub": "..."}}]
+  "labels": [{{"root": ["..."], "sub": ["..."]}}]
 }}
 
 [入力]

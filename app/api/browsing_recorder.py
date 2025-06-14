@@ -148,34 +148,42 @@ class BrowsingRecorder:
             log_id = cursor.lastrowid
             labels = data.get('labels', [])
             for label in labels:
-                root_name = label.get('root')
-                sub_name = label.get('sub')
-                if not root_name or not sub_name:
-                    continue
-                cursor.execute(
-                    "SELECT id FROM root_categories WHERE name=%s", (root_name,)
-                )
-                root_row = cursor.fetchone()
-                if not root_row:
-                    continue
-                root_id = root_row[0]
-                cursor.execute(
-                    "SELECT id FROM sub_categories WHERE root_id=%s AND name=%s",
-                    (root_id, sub_name),
-                )
-                row = cursor.fetchone()
-                if row:
-                    sub_id = row[0]
-                else:
+                roots = label.get('root') or label.get('roots') or []
+                subs = label.get('sub') or label.get('subs') or []
+                if isinstance(roots, str):
+                    roots = [roots]
+                if isinstance(subs, str):
+                    subs = [subs]
+                for root_name in roots:
+                    if not root_name:
+                        continue
                     cursor.execute(
-                        "INSERT INTO sub_categories(root_id, name) VALUES (%s,%s)",
-                        (root_id, sub_name),
+                        "SELECT id FROM root_categories WHERE name=%s", (root_name,)
                     )
-                    sub_id = cursor.lastrowid
-                cursor.execute(
-                    "INSERT IGNORE INTO log_sub_categories(log_id, sub_id) VALUES (%s,%s)",
-                    (log_id, sub_id),
-                )
+                    root_row = cursor.fetchone()
+                    if not root_row:
+                        continue
+                    root_id = root_row[0]
+                    for sub_name in subs:
+                        if not sub_name:
+                            continue
+                        cursor.execute(
+                            "SELECT id FROM sub_categories WHERE root_id=%s AND name=%s",
+                            (root_id, sub_name),
+                        )
+                        row = cursor.fetchone()
+                        if row:
+                            sub_id = row[0]
+                        else:
+                            cursor.execute(
+                                "INSERT INTO sub_categories(root_id, name) VALUES (%s,%s)",
+                                (root_id, sub_name),
+                            )
+                            sub_id = cursor.lastrowid
+                        cursor.execute(
+                            "INSERT IGNORE INTO log_sub_categories(log_id, sub_id) VALUES (%s,%s)",
+                            (log_id, sub_id),
+                        )
             conn.commit()
             print("[✓] Inserted browsing log")
         except mysql.connector.Error as err:
