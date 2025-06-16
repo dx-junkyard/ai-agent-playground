@@ -1,16 +1,25 @@
-CREATE TABLE IF NOT EXISTS browsing_logs (
+CREATE TABLE IF NOT EXISTS pages (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    user_id VARCHAR(255),
-    session_id VARCHAR(255),
     url TEXT,
+    url_hash CHAR(64) NOT NULL UNIQUE,
     title TEXT,
     summary TEXT,
-    scroll_depth FLOAT,
-    visit_start DATETIME,
-    visit_end DATETIME,
+    labels TEXT,
     keywords TEXT,
     search_query TEXT,
     PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS page_visits (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    page_id BIGINT UNSIGNED NOT NULL,
+    user_id VARCHAR(255),
+    session_id VARCHAR(255),
+    scroll_depth FLOAT,
+    visit_start DATETIME,
+    visit_end DATETIME,
+    PRIMARY KEY (id),
+    FOREIGN KEY (page_id) REFERENCES pages(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS root_categories (
@@ -27,10 +36,10 @@ CREATE TABLE IF NOT EXISTS sub_categories (
     FOREIGN KEY (root_id) REFERENCES root_categories(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS log_sub_categories (
-    log_id BIGINT UNSIGNED NOT NULL,
+CREATE TABLE IF NOT EXISTS page_categories (
+    page_id BIGINT UNSIGNED NOT NULL,
     sub_id BIGINT UNSIGNED NOT NULL,
-    PRIMARY KEY (log_id, sub_id),
-    FOREIGN KEY (log_id) REFERENCES browsing_logs(id),
+    PRIMARY KEY (page_id, sub_id),
+    FOREIGN KEY (page_id) REFERENCES pages(id),
     FOREIGN KEY (sub_id) REFERENCES sub_categories(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

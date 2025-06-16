@@ -26,7 +26,10 @@
 │       └── audio_output.py    # 音声出力機能
 ├── voicevox/                  # VOICEVOX エンジンコンテナ
 ├── mysql/                     # MySQLデータベース関連
-│   └── db/user_messages.sql   # テーブル定義(DDL)
+│   └── db/
+│       ├── schema.sql                # テーブル定義
+│       ├── seed_root_categories.sql  # 初期データ
+│       └── user_messages.sql         # メッセージ保存テーブル
 ├── config.py                  # 設定ファイル
 ├── requirements.api.txt       # API依存関係
 ├── requirements.ui.txt        # UI依存関係
@@ -144,7 +147,7 @@ curl 'http://localhost:8086/api/v1/user-messages?user_id=me&limit=10'
 #### ブラウジング情報の送信
 
 Chrome 拡張 [curiosity-capture](https://github.com/dx-junkyard/curiosity-capture-chrome-extension) から送られるページ閲覧データを受け取るエンドポイントです。
-初回起動時に `browsing_logs` テーブルが存在しない場合は API 側で自動的に作成されます。
+利用前に `mysql/db/schema.sql` と `mysql/db/seed_root_categories.sql` を実行してテーブルと初期データを作成してください。
 
 ```bash
 curl http://localhost:8086/api/v1/user-actions \
