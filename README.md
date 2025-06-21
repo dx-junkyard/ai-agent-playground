@@ -163,6 +163,11 @@ curl http://localhost:8086/api/v1/user-actions \
   }'
 ```
 
+ページ滞在時間が 30 秒以上かつスクロール率が 0.3 以上の場合、
+ワーカーがそのページの要約を含むメッセージを WebSocket 経由で
+Chrome 拡張へ送信します。拡張側では受け取ったメッセージを音声
+で再生するため、閲覧ページに関連した話題を自動で振ってくれます。
+
 ## 開発
 
 ### バックエンド（FastAPI）
@@ -172,6 +177,7 @@ curl http://localhost:8086/api/v1/user-actions \
 - `POST /api/v1/user-message`: ユーザーメッセージを処理し、AI応答を返す
 - `GET /api/v1/user-messages`: 過去のメッセージ履歴を取得
 - 送信するプロンプトをログに記録してデバッグ可能
+- OpenAI APIへのリクエストやWebSocket通知の送信状況を詳細にログ出力
 
 ### フロントエンド（Streamlit）
 

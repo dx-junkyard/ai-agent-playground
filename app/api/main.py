@@ -1,6 +1,13 @@
 import requests
-from fastapi import FastAPI, Request, HTTPException, Query
-from typing import Dict, List
+from fastapi import (
+    FastAPI,
+    Request,
+    HTTPException,
+    Query,
+    WebSocket,
+    WebSocketDisconnect,
+)
+from typing import Dict, List, Set
 import logging
 from pathlib import Path
 
@@ -22,6 +29,9 @@ fh.setLevel(logging.INFO)
 fh.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 logger.addHandler(fh)
 
+# WebSocket connections storage
+active_connections: Set[WebSocket] = set()
+
 # LINEのWebhookエンドポイント
 @app.post("/api/v1/user-message")
 async def post_usermessage(request: Request) -> str:
@@ -29,9 +39,10 @@ async def post_usermessage(request: Request) -> str:
         body = await request.json()
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
-   
+
     ai_generator = AIClient()
     message = body.get("message", "")
+    logger.info("User message received: %s", message)
     ai_response = ai_generator.create_response(message)
     logger.info(f"AI response: {ai_response}")
     repo = DBClient()
@@ -47,6 +58,7 @@ async def post_user_actions(request: Request) -> dict:
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
 
+    logger.debug("Received user action: %s", data)
     publish_message(MQ_RAW_QUEUE, data)
     return {"status": "queued"}
 
@@ -55,6 +67,45 @@ async def get_user_messages(user_id: str = Query(..., description="ユーザーI
     repo = DBClient()
     messages = repo.get_user_messages(user_id=user_id, limit=limit)
     return messages
+
+
+# WebSocket endpoint for real-time notifications
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    active_connections.add(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        active_connections.discard(websocket)
+
+
+# HTTP endpoint to broadcast notifications to WebSocket clients
+@app.post("/send-notification")
+async def send_notification(request: Request) -> Dict[str, str]:
+    try:
+        data = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    message = data.get("message")
+    if not message:
+        raise HTTPException(status_code=400, detail="Message is required")
+
+    logger.info("Broadcasting notification: %s", message)
+
+    payload = {"message": message}
+    disconnected: Set[WebSocket] = set()
+    for connection in active_connections:
+        try:
+            await connection.send_json(payload)
+        except Exception:
+            disconnected.add(connection)
+    for conn in disconnected:
+        active_connections.discard(conn)
+    logger.info("Notification sent to %s clients", len(active_connections))
+    return {"status": "sent"}
 
 if __name__ == "__main__":
     import uvicorn
