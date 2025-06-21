@@ -86,6 +86,8 @@ def analyze_action(data: dict) -> dict:
             conn.close()
 
     prompt = PROMPT_TEMPLATE.format(title=title, text=text, roots=ROOT_CATEGORIES)
+    logger.info("Requesting summary from OpenAI for %s", url)
+    logger.debug("Prompt: %s", prompt)
     try:
         response = client.chat.completions.create(
             model=ai_model,
@@ -103,6 +105,7 @@ def analyze_action(data: dict) -> dict:
         result = {"summary": text[:200], "labels": []}
 
     # store result in cache
+    logger.info("Caching result for %s", url)
     conn = None
     cursor = None
     try:

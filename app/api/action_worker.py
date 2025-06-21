@@ -33,6 +33,7 @@ def main() -> None:
 
     def callback(ch, method, properties, body):
         data = json.loads(body)
+        logger.debug("Received data: %s", data)
         stored_summary = recorder.insert_action(data)
         if stored_summary and not data.get("summary"):
             data["summary"] = stored_summary
@@ -51,13 +52,17 @@ def main() -> None:
             duration = (end_dt - start_dt).total_seconds()
         else:
             duration = 0
+        logger.debug("Visit duration=%s scroll=%s", duration, scroll)
 
         if duration >= TIME_THRESHOLD and scroll >= SCROLL_THRESHOLD:
             title = data.get("title") or data.get("url")
             summary = data.get("summary") or ""
             message = f"\u3055\u304d\u307b\u3069\u3054\u89b3\u306b\u306a\u3063\u305f\u300c{title}\u300d\u304c\u6c17\u306b\u306a\u3063\u305f\u3088\u3046\u3067\u3059\u306d\u3002{summary}\u306b\u3064\u3044\u3066\u610f\u898b\u3092\u304d\u304b\u305b\u3066\u304f\u3060\u3055\u3044\u3002"
+            logger.info("Interest detected: duration=%s scroll=%s", duration, scroll)
+            logger.info("Sending message to Chrome extension: %s", message)
             try:
-                requests.post(API_ENDPOINT, json={"message": message}, timeout=5)
+                resp = requests.post(API_ENDPOINT, json={"message": message}, timeout=5)
+                logger.info("Notification response status: %s", resp.status_code)
             except Exception as exc:
                 logger.error("Failed to send notification: %s", exc)
 

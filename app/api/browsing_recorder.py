@@ -64,6 +64,7 @@ class BrowsingRecorder:
             cursor.execute("SELECT id, summary FROM pages WHERE url_hash=%s", (url_hash,))
             row = cursor.fetchone()
             if row:
+                logger.debug("Page cache hit for %s", url)
                 page_id = row[0]
                 if not summary:
                     summary = row[1]
@@ -84,6 +85,7 @@ class BrowsingRecorder:
                     ),
                 )
                 page_id = cursor.lastrowid
+                logger.debug("Inserted new page record for %s", url)
 
             # map categories to page
             labels = data.get('labels', [])
@@ -140,9 +142,9 @@ class BrowsingRecorder:
             )
 
             conn.commit()
-            print("[✓] Inserted page visit")
+            logger.info("Inserted page visit")
         except mysql.connector.Error as err:
-            print(f"[✗] MySQL Error: {err}")
+            logger.error("MySQL Error: %s", err)
         finally:
             if cursor:
                 cursor.close()

@@ -39,9 +39,10 @@ async def post_usermessage(request: Request) -> str:
         body = await request.json()
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
-   
+
     ai_generator = AIClient()
     message = body.get("message", "")
+    logger.info("User message received: %s", message)
     ai_response = ai_generator.create_response(message)
     logger.info(f"AI response: {ai_response}")
     repo = DBClient()
@@ -57,6 +58,7 @@ async def post_user_actions(request: Request) -> dict:
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
 
+    logger.debug("Received user action: %s", data)
     publish_message(MQ_RAW_QUEUE, data)
     return {"status": "queued"}
 
@@ -91,6 +93,8 @@ async def send_notification(request: Request) -> Dict[str, str]:
     if not message:
         raise HTTPException(status_code=400, detail="Message is required")
 
+    logger.info("Broadcasting notification: %s", message)
+
     payload = {"message": message}
     disconnected: Set[WebSocket] = set()
     for connection in active_connections:
@@ -100,6 +104,7 @@ async def send_notification(request: Request) -> Dict[str, str]:
             disconnected.add(connection)
     for conn in disconnected:
         active_connections.discard(conn)
+    logger.info("Notification sent to %s clients", len(active_connections))
     return {"status": "sent"}
 
 if __name__ == "__main__":
