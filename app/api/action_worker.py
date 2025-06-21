@@ -33,7 +33,9 @@ def main() -> None:
 
     def callback(ch, method, properties, body):
         data = json.loads(body)
-        recorder.insert_action(data)
+        stored_summary = recorder.insert_action(data)
+        if stored_summary and not data.get("summary"):
+            data["summary"] = stored_summary
 
         scroll = data.get("scroll_depth") or data.get("scrollDepth") or 0
         try:

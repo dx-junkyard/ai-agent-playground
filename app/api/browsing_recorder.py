@@ -31,10 +31,16 @@ class BrowsingRecorder:
         except ValueError:
             return None
 
-    def insert_action(self, data: Dict[str, Any]) -> None:
-        """Insert browsing action data into pages and page_visits tables."""
+    def insert_action(self, data: Dict[str, Any]) -> Optional[str]:
+        """Insert browsing action data into pages and page_visits tables.
+
+        Returns the summary text found in or stored for the page so that
+        callers can continue processing even when this worker skips
+        generating a new summary.
+        """
         conn = None
         cursor = None
+        summary = data.get('summary')
         try:
             conn = mysql.connector.connect(**self.config)
             cursor = conn.cursor()
@@ -55,10 +61,12 @@ class BrowsingRecorder:
             url_hash = hashlib.sha256(url.encode()).hexdigest()
 
             # check or insert page cache
-            cursor.execute("SELECT id FROM pages WHERE url_hash=%s", (url_hash,))
+            cursor.execute("SELECT id, summary FROM pages WHERE url_hash=%s", (url_hash,))
             row = cursor.fetchone()
             if row:
                 page_id = row[0]
+                if not summary:
+                    summary = row[1]
             else:
                 cursor.execute(
                     """
@@ -140,3 +148,5 @@ class BrowsingRecorder:
                 cursor.close()
             if conn:
                 conn.close()
+
+        return summary
