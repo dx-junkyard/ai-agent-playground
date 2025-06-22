@@ -7,7 +7,9 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
+import base64
 from typing import Dict, List, Set
+from app.api.voicevox import synthesize
 import logging
 from pathlib import Path
 
@@ -95,7 +97,15 @@ async def send_notification(request: Request) -> Dict[str, str]:
 
     logger.info("Broadcasting notification: %s", message)
 
+    audio_bytes = None
+    try:
+        audio_bytes = synthesize(message)
+    except Exception as exc:
+        logger.error("Failed to synthesize voice: %s", exc)
+
     payload = {"message": message}
+    if audio_bytes:
+        payload["audio"] = base64.b64encode(audio_bytes).decode()
     disconnected: Set[WebSocket] = set()
     for connection in active_connections:
         try:

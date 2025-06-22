@@ -51,6 +51,20 @@
   - 解析済みデータを受け取るワーカーが MySQL へ保存
   - 分類に使用する root カテゴリーは `config.py` の `ROOT_CATEGORIES` に固定化
 
+## システム構成
+
+`docker-compose.yaml` で定義された複数のサービスが連携して動作します。
+
+- `ui`: Streamlit によるフロントエンド。ポート `8080` で起動します。
+- `api`: FastAPI バックエンド。ポート `8086` で待ち受けます。
+- `voicevox`: 返答を音声化する VOICEVOX エンジン。ポート `50021`。
+- `db`: MySQL データベース。会話履歴や分析結果を保存します。
+- `rabbitmq`: メッセージキューを提供し、管理 UI はポート `15672` から利用可能です。
+- `processor`: RabbitMQ の生データを要約・分類して次のキューへ転送するワーカー。
+- `worker`: 解析済みデータをデータベースへ保存するワーカー。
+
+UI → API → RabbitMQ → Processor → Worker → DB の流れでデータが処理され、生成された応答は VOICEVOX で音声化されてブラウザに返されます。
+
 ## 実装のポイント
 
 ### バックエンド（FastAPI）
@@ -167,6 +181,9 @@ curl http://localhost:8086/api/v1/user-actions \
 ワーカーがそのページの要約を含むメッセージを WebSocket 経由で
 Chrome 拡張へ送信します。拡張側では受け取ったメッセージを音声
 で再生するため、閲覧ページに関連した話題を自動で振ってくれます。
+生成された音声は VOICEVOX によって作られ、WebSocket メッセージの `audio` フィールド
+に Base64 文字列として含まれます。Chrome 拡張はこのデータをデコードして再生する
+ようにコードを修正してください。従来の Web Speech API を使用する処理は不要です。
 
 ## 開発
 
