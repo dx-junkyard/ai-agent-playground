@@ -6,9 +6,15 @@ from fastapi import (
     Query,
     WebSocket,
     WebSocketDisconnect,
+    UploadFile,
+    File,
 )
 import base64
 from typing import Dict, List, Set
+import os
+import tempfile
+from dotenv import load_dotenv
+from openai import OpenAI
 from app.api.voicevox import synthesize
 import logging
 from pathlib import Path
@@ -30,6 +36,10 @@ fh = logging.FileHandler(log_dir / "ai_responses.log")
 fh.setLevel(logging.INFO)
 fh.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
 logger.addHandler(fh)
+
+# Load OpenAI credentials
+load_dotenv()
+openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY", ""))
 
 # WebSocket connections storage
 active_connections: Set[WebSocket] = set()
@@ -69,6 +79,35 @@ async def get_user_messages(user_id: str = Query(..., description="ユーザーI
     repo = DBClient()
     messages = repo.get_user_messages(user_id=user_id, limit=limit)
     return messages
+
+
+# Endpoint to transcribe uploaded audio using OpenAI Whisper
+@app.post("/api/v1/transcribe")
+async def transcribe_audio(file: UploadFile = File(...)) -> Dict[str, str]:
+    try:
+        contents = await file.read()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Failed to read file")
+
+    with tempfile.NamedTemporaryFile(suffix=".webm") as tmp:
+        tmp.write(contents)
+        tmp.seek(0)
+        try:
+            with open(tmp.name, "rb") as f:
+                result = openai_client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=f,
+                    language="ja",
+                )
+            text = result.text.strip()
+        except Exception as exc:
+            logger.error("Whisper API error: %s", exc)
+            raise HTTPException(status_code=500, detail="Transcription failed")
+
+    logger.info("Transcribed audio text: %s", text)
+    repo = DBClient()
+    repo.insert_message("me", text)
+    return {"text": text}
 
 
 # WebSocket endpoint for real-time notifications

@@ -193,6 +193,7 @@ Chrome 拡張へ送信します。拡張側では受け取ったメッセージ�
 
 - `POST /api/v1/user-message`: ユーザーメッセージを処理し、AI応答を返す
 - `GET /api/v1/user-messages`: 過去のメッセージ履歴を取得
+- `POST /api/v1/transcribe`: 音声ファイルを文字起こししてテキストを返す
 - 送信するプロンプトをログに記録してデバッグ可能
 - OpenAI APIへのリクエストやWebSocket通知の送信状況を詳細にログ出力
 
