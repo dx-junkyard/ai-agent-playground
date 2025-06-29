@@ -70,8 +70,9 @@ async def post_user_actions(request: Request) -> dict:
     except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
 
-    logger.debug("Received user action: %s", data)
+    logger.info("Received user action: %s", data)
     publish_message(MQ_RAW_QUEUE, data)
+    logger.info("User action queued")
     return {"status": "queued"}
 
 @app.get("/api/v1/user-messages")
