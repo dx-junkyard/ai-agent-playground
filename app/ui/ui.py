@@ -5,6 +5,7 @@ import streamlit as st
 
 from voice_input import VoiceInput
 from audio_output import AudioOutput
+from line_login import ensure_login
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +21,11 @@ class ChatUI:
 
     @staticmethod
     def call_api(text: str) -> str:
+        payload = {"message": text}
+        if "user_id" in st.session_state:
+            payload["user_id"] = st.session_state["user_id"]
         try:
-            resp = requests.post(API_URL, json={"message": text})
+            resp = requests.post(API_URL, json=payload)
             resp.raise_for_status()
             return resp.text.strip()
         except Exception as e:
@@ -36,6 +40,7 @@ class ChatUI:
             st.rerun()
 
     def run(self):
+        ensure_login()
         st.set_page_config(page_title="AI チャットアプリ", page_icon="🤖")
 
         if "messages" not in st.session_state:
