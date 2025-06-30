@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 import streamlit as st
 from dotenv import load_dotenv
@@ -38,8 +39,13 @@ class AudioOutput:
     def speak(self, text: str) -> None:
         if not text:
             return
+
+        sanitized = re.sub(r"https?://\S+", "", text).strip()
+        if not sanitized:
+            return
+
         try:
-            audio = self._synthesize(text)
+            audio = self._synthesize(sanitized)
             st.audio(audio, format="audio/wav", autoplay=True)
         except Exception as e:
             st.error(f"音声生成失敗: {e}")
