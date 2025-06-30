@@ -30,7 +30,7 @@ class AIClient:
             return self.prompt_path.read_text(encoding="utf-8")
         except Exception as e:
             logger.error(f"Failed to read prompt template: {e}")
-            return "以下は複数のユーザーの発言です。会話が盛り上がるよう、自然な返答をしてください。\n【ユーザー発言】:\n{user_message}\n"
+            return "以下はユーザーの発言です。会話が盛り上がるよう、自然な返答をしてください。\n【ユーザー発言】:\n{user_message}\n"
 
     def create_response(self, user_message: str) -> str:
         """
