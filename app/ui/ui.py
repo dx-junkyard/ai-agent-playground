@@ -56,8 +56,8 @@ class ChatUI:
                 st.session_state.voice_processed = True
                 st.session_state.messages.append({"role": "user", "content": text})
                 reply = self.call_api(text)
+                self.audio_output.speak(reply)
                 st.session_state.messages.append({"role": "assistant", "content": reply})
-                st.session_state.speak_text = reply
                 self._rerun()
             elif not text:
                 st.session_state.voice_processed = False
@@ -65,9 +65,6 @@ class ChatUI:
         for m in st.session_state.messages:
             with st.chat_message("user" if m["role"] == "user" else "ai"):
                 st.markdown(m["content"])
-
-        if "speak_text" in st.session_state:
-            self.audio_output.speak(st.session_state.pop("speak_text"))
 
         prompt = st.chat_input("メッセージを入力...")
         audio = self.voice.record_audio()
@@ -78,10 +75,10 @@ class ChatUI:
                 st.markdown(prompt)
 
             reply = self.call_api(prompt)
+            self.audio_output.speak(reply)
             st.session_state.messages.append({"role": "assistant", "content": reply})
             with st.chat_message("ai"):
                 st.markdown(reply)
-            st.session_state.speak_text = reply
 
         if len(audio) > 0:
             st.session_state.last_audio = audio
