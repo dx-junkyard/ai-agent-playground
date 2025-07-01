@@ -2,13 +2,14 @@ import requests
 import re
 from bs4 import BeautifulSoup
 from fastapi import FastAPI, Request, HTTPException, Query
-from typing import Dict, List
+from typing import Dict, List, Any
 import logging
 
 # config.pyからトークンやAPIエンドポイントをインポート
 from app.api.ai import AIClient
 from app.api.db import DBClient
 from app.api.page_analyzer import analyze_page
+from app.api.chat_analyzer import analyze_chat
 
 app = FastAPI()
 
@@ -30,7 +31,7 @@ async def create_user(request: Request) -> Dict[str, str]:
 
 # LINEのWebhookエンドポイント
 @app.post("/api/v1/user-message")
-async def post_usermessage(request: Request) -> str:
+async def post_usermessage(request: Request) -> Dict[str, Any]:
     try:
         body = await request.json()
     except Exception:
@@ -58,14 +59,20 @@ async def post_usermessage(request: Request) -> str:
             logger.error("Failed to fetch %s: %s", url, exc)
         analyze_page(title=title, text=page_text, url=url, source_type="web")
 
+    user_analysis = None
     if text_without_urls:
-        analyze_page(title="", text=text_without_urls, source_type="chat")
+        user_analysis = analyze_chat(text=text_without_urls)
 
     ai_response = ai_generator.create_response(message)
     logger.info(f"AI response: {ai_response}")
+    ai_analysis = analyze_chat(text=ai_response)
     if user_id:
         repo.insert_message(user_id, "ai", ai_response)
-    return ai_response
+    return {
+        "user_analysis": user_analysis,
+        "ai_message": ai_response,
+        "ai_analysis": ai_analysis,
+    }
 
 @app.get("/api/v1/user-messages")
 async def get_user_messages(user_id: str = Query(..., description="ユーザーID"), limit: int = Query(10, ge=1, le=100, description="取得件数")) -> List[Dict]:
