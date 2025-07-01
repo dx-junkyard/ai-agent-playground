@@ -27,7 +27,8 @@ class ChatUI:
         try:
             resp = requests.post(API_URL, json=payload)
             resp.raise_for_status()
-            return resp.text.strip()
+            data = resp.json()
+            return data.get("ai_message", "")
         except Exception as e:
             st.error(f"送信エラー: {e}")
             return "エラーが発生しました"
