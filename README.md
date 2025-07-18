@@ -23,6 +23,7 @@
 │   │   └── db.py              # メッセージ保存ロジック
 │   └── ui/                    # Streamlitフロントエンド
 │       ├── ui.py              # UIアプリケーション
+│       ├── line_login.py      # LINE Login 認証
 │       ├── voice_input.py     # 音声入力機能
 │       └── audio_output.py    # 音声出力機能
 ├── voicevox/                  # VOICEVOX エンジンコンテナ
