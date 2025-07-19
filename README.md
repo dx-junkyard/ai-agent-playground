@@ -1,6 +1,7 @@
 # AI Agent 開発講座（音声入出力編）
 
-このプロジェクトは、AIエージェントと対話するためのWebアプリケーションです。FastAPIバックエンドとStreamlitフロントエンドで構成され、ブラウザで音声入力と音声出力が利用できます。
+## 概要
+このプロジェクトは、AIエージェントと対話するWebアプリケーションのサンプルです。FastAPI バックエンドと Streamlit フロントエンドで構成され、ブラウザだけで音声入力と音声出力が利用できます。
 
 ## 学習内容
 
@@ -22,6 +23,7 @@
 │   │   └── db.py              # メッセージ保存ロジック
 │   └── ui/                    # Streamlitフロントエンド
 │       ├── ui.py              # UIアプリケーション
+│       ├── line_login.py      # LINE Login 認証
 │       ├── voice_input.py     # 音声入力機能
 │       └── audio_output.py    # 音声出力機能
 ├── voicevox/                  # VOICEVOX エンジンコンテナ
@@ -55,9 +57,19 @@
 - ユーザーインターフェースの実装
 - APIとの通信処理
 - セッション状態を使用した会話履歴の管理
- - OpenAI Whisper API を利用した音声認識
+- OpenAI Whisper API を利用した音声認識
 - 音声認識結果とLLMへ送信するプロンプトをログ出力
- - AI応答を VOICEVOX で音声生成して再生
+- AI応答を VOICEVOX で音声生成して再生
+
+## LINE Login を使った認証機能
+
+他の講座にはない特徴として、LINE Login を用いた OAuth 認証を実装しています。`app/ui/line_login.py` でログイン処理を行い、LINE アカウントのプロフィール情報を取得してバックエンドにユーザー登録します。これにより以下のようなことが可能になります。
+
+- LINE アカウントに紐づけた会話履歴の管理
+- ユーザーごとにカスタマイズした応答の提供
+- 他サービスとの連携を見据えた拡張
+
+`.env` に `LINE_CHANNEL_ID`、`LINE_CHANNEL_SECRET`、`LINE_REDIRECT_URI` を設定した状態で `docker compose up` を実行すると、Streamlit 画面に LINE Login ボタンが表示されます。
 
 ## セットアップ
 
